@@ -3,11 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sistem Inspeksi & Keuangan Showroom</title>
+    <title>Sistem Inspeksi & Keuangan FouryCars Cloud</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- FontAwesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Firebase SDK (Version 9+ Compat) -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
 </head>
 <body class="bg-slate-900 text-slate-100 font-sans min-h-screen p-3 md:p-6">
 
@@ -15,8 +19,8 @@
         
         <!-- Toast Notification Area -->
         <div id="toast" class="fixed top-5 right-5 z-50 hidden bg-emerald-600 text-white px-5 py-3 rounded-xl shadow-2xl flex items-center gap-3 border border-emerald-400">
-            <i class="fa-solid fa-circle-check text-xl"></i>
-            <span id="toastMsg" class="text-sm font-semibold">Data berhasil disimpan!</span>
+            <i class="fa-solid fa-cloud-arrow-up text-xl"></i>
+            <span id="toastMsg" class="text-sm font-semibold">Tersimpan di Cloud Database!</span>
         </div>
 
         <!-- Dashboard Header & Keuangan -->
@@ -24,14 +28,11 @@
             <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b border-slate-700 pb-4">
                 <div>
                     <h1 class="text-2xl md:text-3xl font-extrabold text-emerald-400 flex items-center gap-2">
-                        <i class="fa-solid fa-car-tunnel"></i> Inspector & Showroom Ledger
+                        <i class="fa-solid fa-cloud"></i> Inspector & Showroom Ledger (Cloud Sync)
                     </h1>
-                    <p class="text-slate-400 text-xs md:text-sm">Database Inspeksi Kendaraan & Rekapitulasi Keuangan (IndexedDB Engine)</p>
+                    <p class="text-slate-400 text-xs md:text-sm">Tersimpan Permanen di Server Google Firebase Database</p>
                 </div>
                 <div class="flex gap-2">
-                    <button onclick="exportData()" class="bg-slate-700 hover:bg-slate-600 text-xs px-3 py-2 rounded-lg border border-slate-600 flex items-center gap-1">
-                        <i class="fa-solid fa-download"></i> Backup JSON
-                    </button>
                     <button onclick="resetForm()" class="bg-amber-600 hover:bg-amber-500 text-xs px-3 py-2 rounded-lg text-white flex items-center gap-1">
                         <i class="fa-solid fa-rotate-left"></i> Reset Form
                     </button>
@@ -222,7 +223,7 @@
                     </div>
 
                     <button type="button" onclick="saveUnitData()" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-3 rounded-xl transition-all shadow-lg flex items-center justify-center gap-2 text-sm">
-                        <i class="fa-solid fa-floppy-disk"></i> Simpan Laporan Inspeksi Unit Ke Database
+                        <i class="fa-solid fa-cloud-arrow-up"></i> Simpan Unit Ke Cloud Database
                     </button>
                 </section>
 
@@ -267,30 +268,21 @@
         }
     </style>
 
-    <!-- IndexedDB & Logic Script -->
+    <!-- Firebase Script -->
     <script>
-        let db;
-        const dbName = "ShowroomGarageDB";
-        const storeName = "inspection_units";
-
-        // Inisialisasi Database Bawaan Browser (IndexedDB)
-        const request = indexedDB.open(dbName, 1);
-
-        request.onupgradeneeded = function(e) {
-            db = e.target.result;
-            if (!db.objectStoreNames.contains(storeName)) {
-                db.createObjectStore(storeName, { keyPath: "id" });
-            }
+        // PASTE FIREBASE CONFIG ANDA DI BAWAH INI:
+        const firebaseConfig = {
+            apiKey: "PASTE_API_KEY_ANDA_DI_SINI",
+            authDomain: "PASTE_PROJECT_ID.firebaseapp.com",
+            projectId: "PASTE_PROJECT_ID_DI_SINI",
+            storageBucket: "PASTE_PROJECT_ID.appspot.com",
+            messagingSenderId: "1234567890",
+            appId: "1:1234567890:web:abcdef123456"
         };
 
-        request.onsuccess = function(e) {
-            db = e.target.result;
-            renderDashboard();
-        };
-
-        request.onerror = function(e) {
-            console.error("IndexedDB Gagal Diakses:", e);
-        };
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
 
         function showToast(msg) {
             const toast = document.getElementById('toast');
@@ -334,7 +326,6 @@
             });
 
             const newUnit = {
-                id: Date.now(),
                 carName: carName,
                 carNopol: carNopol,
                 carSpec: carSpec,
@@ -344,22 +335,19 @@
                 totalModal: fin.totalModal,
                 profit: fin.profit,
                 checklist: checkedPoints,
+                createdAt: firebase.firestore.FieldValue.serverTimestamp(),
                 timestamp: new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' })
             };
 
-            const tx = db.transaction(storeName, "readwrite");
-            const store = tx.objectStore(storeName);
-            store.add(newUnit);
-
-            tx.oncomplete = function() {
-                showToast('✅ Data unit "' + carName + '" BERHASIL TERSIMPAN!');
+            // Simpan langsung ke Server Google Firebase
+            db.collection("cars").add(newUnit)
+            .then(() => {
+                showToast('✅ Berhasil Tersimpan di Server Google Cloud!');
                 resetForm();
-                renderDashboard();
-            };
-
-            tx.onerror = function() {
-                showToast('❌ Gagal menyimpan data ke database.');
-            };
+            })
+            .catch((error) => {
+                showToast('❌ Gagal Simpan: ' + error.message);
+            });
         }
 
         function resetForm() {
@@ -373,116 +361,84 @@
             calculateFinancials();
         }
 
-        function deleteUnit(id) {
-            if (confirm('Apakah Anda yakin ingin menghapus data unit ini?')) {
-                const tx = db.transaction(storeName, "readwrite");
-                const store = tx.objectStore(storeName);
-                store.delete(id);
-
-                tx.oncomplete = function() {
-                    showToast('🗑️ Data unit berhasil dihapus.');
-                    renderDashboard();
-                };
+        function deleteUnit(docId) {
+            if (confirm('Apakah Anda yakin ingin menghapus data unit ini dari Cloud Database?')) {
+                db.collection("cars").doc(docId).delete()
+                .then(() => {
+                    showToast('🗑️ Data berhasil dihapus dari Cloud.');
+                });
             }
         }
 
-        function renderDashboard() {
-            if (!db) return;
-
+        // Realtime Listener (Otomatis Update tanpa perlu Refresh)
+        db.collection("cars").orderBy("createdAt", "desc").onSnapshot((snapshot) => {
             const container = document.getElementById('unitListContainer');
             container.innerHTML = '';
 
-            const tx = db.transaction(storeName, "readonly");
-            const store = tx.objectStore(storeName);
-            const req = store.getAll();
+            let sumModal = 0;
+            let sumOmset = 0;
+            let sumProfit = 0;
+            let count = 0;
 
-            req.onsuccess = function() {
-                const database = req.result || [];
-                let sumModal = 0;
-                let sumOmset = 0;
-                let sumProfit = 0;
+            snapshot.forEach((doc) => {
+                count++;
+                const item = doc.data();
+                const docId = doc.id;
 
-                document.getElementById('unitBadgeCount').innerText = database.length + ' Unit';
+                sumModal += item.totalModal || 0;
+                sumOmset += item.sellPrice || 0;
+                sumProfit += item.profit || 0;
 
-                if (database.length === 0) {
-                    container.innerHTML = `
-                        <div class="text-center py-8 text-slate-500 space-y-2">
-                            <i class="fa-solid fa-folder-open text-3xl"></i>
-                            <p class="text-xs">Belum ada unit tersimpan di database browser ini.</p>
-                        </div>`;
-                }
-
-                database.forEach(item => {
-                    sumModal += item.totalModal;
-                    sumOmset += item.sellPrice;
-                    sumProfit += item.profit;
-
-                    const card = document.createElement('div');
-                    card.className = 'bg-slate-900 border border-slate-700 p-4 rounded-xl space-y-3 shadow-sm';
-                    
-                    card.innerHTML = `
-                        <div class="flex justify-between items-start border-b border-slate-800 pb-2">
-                            <div>
-                                <h4 class="font-bold text-slate-100 text-sm">${item.carName}</h4>
-                                <span class="text-[11px] text-slate-400 block">${item.carNopol || 'Tanpa Nopol'} • ${item.carSpec || '-'}</span>
-                            </div>
-                            <button onclick="deleteUnit(${item.id})" class="text-rose-400 hover:text-rose-300 text-xs p-1">
-                                <i class="fa-solid fa-trash-can"></i>
-                            </button>
-                        </div>
-
-                        <div class="grid grid-cols-2 gap-2 text-xs bg-slate-950 p-2.5 rounded-lg border border-slate-800/80">
-                            <div>
-                                <span class="text-slate-500 block text-[10px]">Total Modal</span>
-                                <span class="font-bold text-amber-400">Rp ${item.totalModal.toLocaleString('id-ID')}</span>
-                            </div>
-                            <div>
-                                <span class="text-slate-500 block text-[10px]">Target Jual</span>
-                                <span class="font-bold text-blue-400">Rp ${item.sellPrice.toLocaleString('id-ID')}</span>
-                            </div>
-                            <div class="col-span-2 border-t border-slate-800 pt-1 flex justify-between items-center">
-                                <span class="text-slate-400 text-[10px]">Proyeksi Profit:</span>
-                                <span class="font-bold text-emerald-400">Rp ${item.profit.toLocaleString('id-ID')}</span>
-                            </div>
-                        </div>
-
+                const card = document.createElement('div');
+                card.className = 'bg-slate-900 border border-slate-700 p-4 rounded-xl space-y-3 shadow-sm';
+                
+                card.innerHTML = `
+                    <div class="flex justify-between items-start border-b border-slate-800 pb-2">
                         <div>
-                            <span class="text-[10px] text-emerald-400 font-bold uppercase tracking-wider block mb-1">
-                                Poin Lolos (${item.checklist ? item.checklist.length : 0}):
-                            </span>
-                            <div class="flex flex-wrap gap-1 max-h-24 overflow-y-auto pr-1">
-                                ${item.checklist && item.checklist.length > 0 ? item.checklist.map(point => `<span class="bg-slate-800 text-slate-300 text-[10px] px-2 py-0.5 rounded border border-slate-700">${point}</span>`).join('') : '<span class="text-[10px] text-slate-500">Tidak ada item tercentang</span>'}
-                            </div>
+                            <h4 class="font-bold text-slate-100 text-sm">${item.carName}</h4>
+                            <span class="text-[11px] text-slate-400 block">${item.carNopol || 'Tanpa Nopol'} • ${item.carSpec || '-'}</span>
                         </div>
+                        <button onclick="deleteUnit('${docId}')" class="text-rose-400 hover:text-rose-300 text-xs p-1">
+                            <i class="fa-solid fa-trash-can"></i>
+                        </button>
+                    </div>
 
-                        <div class="text-[10px] text-slate-500 text-right">Tercatat: ${item.timestamp}</div>
-                    `;
+                    <div class="grid grid-cols-2 gap-2 text-xs bg-slate-950 p-2.5 rounded-lg border border-slate-800/80">
+                        <div>
+                            <span class="text-slate-500 block text-[10px]">Total Modal</span>
+                            <span class="font-bold text-amber-400">Rp ${(item.totalModal || 0).toLocaleString('id-ID')}</span>
+                        </div>
+                        <div>
+                            <span class="text-slate-500 block text-[10px]">Target Jual</span>
+                            <span class="font-bold text-blue-400">Rp ${(item.sellPrice || 0).toLocaleString('id-ID')}</span>
+                        </div>
+                        <div class="col-span-2 border-t border-slate-800 pt-1 flex justify-between items-center">
+                            <span class="text-slate-400 text-[10px]">Proyeksi Profit:</span>
+                            <span class="font-bold text-emerald-400">Rp ${(item.profit || 0).toLocaleString('id-ID')}</span>
+                        </div>
+                    </div>
 
-                    container.appendChild(card);
-                });
+                    <div>
+                        <span class="text-[10px] text-emerald-400 font-bold uppercase tracking-wider block mb-1">
+                            Poin Lolos (${item.checklist ? item.checklist.length : 0}):
+                        </span>
+                        <div class="flex flex-wrap gap-1 max-h-24 overflow-y-auto pr-1">
+                            ${item.checklist && item.checklist.length > 0 ? item.checklist.map(point => `<span class="bg-slate-800 text-slate-300 text-[10px] px-2 py-0.5 rounded border border-slate-700">${point}</span>`).join('') : '<span class="text-[10px] text-slate-500">Tidak ada item tercentang</span>'}
+                        </div>
+                    </div>
 
-                document.getElementById('summaryTotalUnit').innerText = database.length + ' Unit';
-                document.getElementById('summaryModal').innerText = 'Rp ' + sumModal.toLocaleString('id-ID');
-                document.getElementById('summaryOmset').innerText = 'Rp ' + sumOmset.toLocaleString('id-ID');
-                document.getElementById('summaryProfit').innerText = 'Rp ' + sumProfit.toLocaleString('id-ID');
-            };
-        }
+                    <div class="text-[10px] text-slate-500 text-right">Tercatat: ${item.timestamp || '-'}</div>
+                `;
 
-        function exportData() {
-            const tx = db.transaction(storeName, "readonly");
-            const store = tx.objectStore(storeName);
-            const req = store.getAll();
+                container.appendChild(card);
+            });
 
-            req.onsuccess = function() {
-                const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(req.result, null, 2));
-                const downloadAnchor = document.createElement('a');
-                downloadAnchor.setAttribute("href", dataStr);
-                downloadAnchor.setAttribute("download", `backup_showroom_${Date.now()}.json`);
-                document.body.appendChild(downloadAnchor);
-                downloadAnchor.click();
-                downloadAnchor.remove();
-            };
-        }
+            document.getElementById('unitBadgeCount').innerText = count + ' Unit';
+            document.getElementById('summaryTotalUnit').innerText = count + ' Unit';
+            document.getElementById('summaryModal').innerText = 'Rp ' + sumModal.toLocaleString('id-ID');
+            document.getElementById('summaryOmset').innerText = 'Rp ' + sumOmset.toLocaleString('id-ID');
+            document.getElementById('summaryProfit').innerText = 'Rp ' + sumProfit.toLocaleString('id-ID');
+        });
     </script>
 </body>
 </html>
