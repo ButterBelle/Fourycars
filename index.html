@@ -144,10 +144,10 @@
                         </div>
                     </div>
 
-                    <!-- Kategori 2: Mesin & Diesel/Bensin -->
+                    <!-- Kategori 2: Mesin & System Pendingin -->
                     <div class="space-y-2">
                         <h3 class="text-xs font-bold text-amber-400 uppercase tracking-wider flex items-center gap-1">
-                            <i class="fa-solid fa-gears"></i> 2. Dapur Pacu & Engine Mounting
+                            <i class="fa-solid fa-gears"></i> 2. Dapur Pacu, Pendingin & Kelistrikan
                         </h3>
                         <div class="grid grid-cols-2 md:grid-cols-3 gap-2 text-xs">
                             <label class="chk-label"><input type="checkbox" value="Engine Mounting Kanan/Kiri Halus" class="chk-item"> Engine Mounting Bagus</label>
@@ -157,6 +157,10 @@
                             <label class="chk-label"><input type="checkbox" value="EGR / Intake Sistem OK" class="chk-item"> EGR / Intake Sistem OK</label>
                             <label class="chk-label"><input type="checkbox" value="Bebas Asap Ngebul/Hitam Pekat" class="chk-item"> Bebas Asap Ngebul/Hitam</label>
                             <label class="chk-label"><input type="checkbox" value="Radiator & Coolant OK" class="chk-item"> Radiator & Coolant OK</label>
+                            <label class="chk-label"><input type="checkbox" value="Selang-selang Radiator Bagus/No Getas" class="chk-item"> Selang Radiator No Getas/Bocor</label>
+                            <label class="chk-label"><input type="checkbox" value="Kabel Mesin / Wiring Rapi" class="chk-item"> Wayar/Kabel Rapi (No Jumper)</label>
+                            <label class="chk-label"><input type="checkbox" value="Filter Udara & Box Utuh" class="chk-item"> Filter Udara & Box Utuh</label>
+                            <label class="chk-label"><input type="checkbox" value="Intercooler Bersih / Bebas Bocor" class="chk-item"> Intercooler Bersih/No Rembes</label>
                             <label class="chk-label"><input type="checkbox" value="Alternator & Pengisian Aki OK" class="chk-item"> Alternator & Aki OK</label>
                             <label class="chk-label"><input type="checkbox" value="Turbocharger Bekerja Normal" class="chk-item"> Turbocharger Normal</label>
                             <label class="chk-label"><input type="checkbox" value="Bebas Rembes Oli Carter/Head" class="chk-item"> Bebas Rembes Oli</label>
@@ -240,11 +244,19 @@
                         </div>
                     </div>
 
+                    <!-- Kolom Catatan Tambahan Kerusakan / Notes -->
+                    <div class="space-y-2">
+                        <h3 class="text-xs font-bold text-amber-400 uppercase tracking-wider flex items-center gap-1">
+                            <i class="fa-solid fa-pen-to-square"></i> 8. Catatan Khusus & Kerusakan Lainnya
+                        </h3>
+                        <textarea id="carNotes" rows="3" placeholder="Tuliskan catatan kerusakan khusus atau PR tambahan yang tidak ada di checklist di sini (Misal: Power steering agak berat, lampu depan kanan pecah rambut, dll)..." class="w-full bg-slate-900 border border-slate-700 rounded-lg p-3 text-xs text-slate-100 focus:outline-none focus:border-emerald-500"></textarea>
+                    </div>
+
                     <!-- Form PIN Keamanan -->
                     <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-2">
                         <label class="block text-xs text-amber-400 font-bold"><i class="fa-solid fa-lock mr-1"></i> Masukkan PIN Keamanan untuk Menyimpan Data:</label>
                         <div class="flex gap-2">
-                            <input type="password" id="userPin" placeholder="PIN Rahasia (Default: 1234)" class="bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-xs text-slate-100 focus:outline-none focus:border-emerald-500 w-full">
+                            <input type="password" id="userPin" placeholder="PIN Rahasia (Default: 187255)" class="bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-xs text-slate-100 focus:outline-none focus:border-emerald-500 w-full">
                             <button type="button" onclick="saveUnitData()" class="bg-emerald-600 hover:bg-emerald-500 text-white font-bold px-6 py-2.5 rounded-lg transition-all shadow-lg flex items-center gap-2 text-xs whitespace-nowrap">
                                 <i class="fa-solid fa-cloud-arrow-up"></i> Simpan Unit
                             </button>
@@ -307,7 +319,7 @@
             measurementId: "G-HQPZ29H0W9"
         };
 
-        // PIN KEAMANAN DEFAULT (Dapat Anda Ubah)
+        // PIN KEAMANAN DEFAULT
         const MASTER_PIN = "187255";
 
         // Initialize Firebase
@@ -371,6 +383,7 @@
             const carName = carNameInput ? carNameInput.value.trim() : '';
             const carNopol = document.getElementById('carNopol').value;
             const carSpec = document.getElementById('carSpec').value;
+            const carNotes = document.getElementById('carNotes').value.trim();
             const coords = document.getElementById('geoCoords').value;
             const fin = calculateFinancials();
 
@@ -389,6 +402,7 @@
                 carName: carName,
                 carNopol: carNopol,
                 carSpec: carSpec,
+                carNotes: carNotes,
                 buyPrice: fin.buy,
                 repairCost: fin.repair,
                 sellPrice: fin.sell,
@@ -414,6 +428,7 @@
             document.getElementById('carName').value = '';
             document.getElementById('carNopol').value = '';
             document.getElementById('carSpec').value = '';
+            document.getElementById('carNotes').value = '';
             document.getElementById('buyPrice').value = '';
             document.getElementById('repairCost').value = '';
             document.getElementById('sellPrice').value = '';
@@ -490,6 +505,8 @@
 
                     ${item.coords ? `<div class="text-[10px] text-slate-400"><i class="fa-solid fa-location-dot text-rose-400 mr-1"></i><a href="https://maps.google.com/?q=${item.coords}" target="_blank" class="text-blue-400 underline">Lihat Peta Lokasi Pembelian</a></div>` : ''}
 
+                    ${item.carNotes ? `<div class="text-[11px] bg-amber-500/10 border border-amber-500/30 p-2 rounded text-amber-300"><strong>Catatan PR:</strong> ${item.carNotes}</div>` : ''}
+
                     <div>
                         <span class="text-[10px] text-emerald-400 font-bold uppercase tracking-wider block mb-1">
                             Poin Lolos (${item.checklist ? item.checklist.length : 0}):
@@ -519,7 +536,7 @@
                 return;
             }
 
-            let csvContent = "data:text/csv;charset=utf-8,Nama Mobil,Nopol,Spesifikasi,Harga Beli,Biaya PR,Total Modal,Target Jual,Estimasi Profit,Koordinat GPS,Tanggal Inspeksi\n";
+            let csvContent = "data:text/csv;charset=utf-8,Nama Mobil,Nopol,Spesifikasi,Harga Beli,Biaya PR,Total Modal,Target Jual,Estimasi Profit,Catatan PR,Koordinat GPS,Tanggal Inspeksi\n";
 
             cachedCarsData.forEach(item => {
                 const row = [
@@ -531,6 +548,7 @@
                     item.totalModal || 0,
                     item.sellPrice || 0,
                     item.profit || 0,
+                    `"${item.carNotes || ''}"`,
                     `"${item.coords || ''}"`,
                     `"${item.timestamp || ''}"`
                 ].join(",");
