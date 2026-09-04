@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sistem Inspeksi & Keuangan FouryCars Cloud</title>
+    <title>Sistem Inspeksi & Keuangan Showroom Cloud Pro</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- FontAwesome Icons -->
@@ -19,7 +19,7 @@
         
         <!-- Toast Notification Area -->
         <div id="toast" class="fixed top-5 right-5 z-50 hidden bg-emerald-600 text-white px-5 py-3 rounded-xl shadow-2xl flex items-center gap-3 border border-emerald-400">
-            <i class="fa-solid fa-cloud-arrow-up text-xl"></i>
+            <i class="fa-solid fa-circle-check text-xl"></i>
             <span id="toastMsg" class="text-sm font-semibold">Tersimpan di Cloud Database!</span>
         </div>
 
@@ -28,11 +28,14 @@
             <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b border-slate-700 pb-4">
                 <div>
                     <h1 class="text-2xl md:text-3xl font-extrabold text-emerald-400 flex items-center gap-2">
-                        <i class="fa-solid fa-cloud"></i> Inspector & Showroom Ledger (Cloud Sync)
+                        <i class="fa-solid fa-cloud"></i> Inspector & Showroom Ledger Pro
                     </h1>
-                    <p class="text-slate-400 text-xs md:text-sm">Tersimpan Permanen di Server Google Firebase Database</p>
+                    <p class="text-slate-400 text-xs md:text-sm">Database Inspeksi Kendaraan, Keuangan & GPS Location (Firebase Cloud)</p>
                 </div>
                 <div class="flex gap-2">
+                    <button onclick="exportToCSV()" class="bg-emerald-700 hover:bg-emerald-600 text-xs px-3 py-2 rounded-lg border border-emerald-600 text-white flex items-center gap-1 font-semibold">
+                        <i class="fa-solid fa-file-excel"></i> Export Excel (CSV)
+                    </button>
                     <button onclick="resetForm()" class="bg-amber-600 hover:bg-amber-500 text-xs px-3 py-2 rounded-lg text-white flex items-center gap-1">
                         <i class="fa-solid fa-rotate-left"></i> Reset Form
                     </button>
@@ -66,11 +69,15 @@
             <!-- Form & Checklist (2 Cols) -->
             <div class="lg:col-span-2 space-y-6">
                 
-                <!-- 1. Data Unit & Finansial -->
+                <!-- 1. Data Unit, Finansial & Lokasi -->
                 <section class="bg-slate-800 p-5 rounded-xl border border-slate-700 shadow-md space-y-4">
-                    <h2 class="text-lg font-bold text-slate-200 flex items-center gap-2 border-b border-slate-700 pb-2">
-                        <i class="fa-solid fa-coins text-emerald-400"></i> Data Kendaraan & Biaya Modal
+                    <h2 class="text-lg font-bold text-slate-200 flex items-center justify-between border-b border-slate-700 pb-2">
+                        <span class="flex items-center gap-2"><i class="fa-solid fa-coins text-emerald-400"></i> Data Kendaraan & Biaya Modal</span>
+                        <button onclick="getGPSLocation()" type="button" class="bg-slate-700 hover:bg-slate-600 text-[11px] text-emerald-400 px-2.5 py-1 rounded border border-slate-600 flex items-center gap-1">
+                            <i class="fa-solid fa-location-crosshairs"></i> Ambil Lokasi Saya
+                        </button>
                     </h2>
+                    
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
                         <div>
                             <label class="block text-xs text-slate-400 mb-1">Nama / Tipe Mobil <span class="text-rose-500">*</span></label>
@@ -81,7 +88,7 @@
                             <input type="text" id="carNopol" placeholder="BK 1234 XX / Hitam" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-xs text-slate-100 focus:outline-none focus:border-emerald-500">
                         </div>
                         <div>
-                            <label class="block text-xs text-slate-400 mb-1">Tahun & Jenis Bahan Bakar</label>
+                            <label class="block text-xs text-slate-400 mb-1">Tahun & Bahan Bakar</label>
                             <input type="text" id="carSpec" placeholder="2019 / Diesel" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-xs text-slate-100 focus:outline-none focus:border-emerald-500">
                         </div>
                         <div>
@@ -89,7 +96,7 @@
                             <input type="number" id="buyPrice" oninput="calculateFinancials()" placeholder="0" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-xs text-slate-100 focus:outline-none focus:border-emerald-500">
                         </div>
                         <div>
-                            <label class="block text-xs text-slate-400 mb-1">Estimasi Biaya PR / Restorasi (Rp)</label>
+                            <label class="block text-xs text-slate-400 mb-1">Estimasi PR / Restorasi (Rp)</label>
                             <input type="number" id="repairCost" oninput="calculateFinancials()" placeholder="0" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-xs text-slate-100 focus:outline-none focus:border-emerald-500">
                         </div>
                         <div>
@@ -97,6 +104,13 @@
                             <input type="number" id="sellPrice" oninput="calculateFinancials()" placeholder="0" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-xs text-slate-100 focus:outline-none focus:border-emerald-500">
                         </div>
                     </div>
+
+                    <!-- Koordinat GPS -->
+                    <div class="bg-slate-950 p-2.5 rounded-lg border border-slate-800 text-xs flex justify-between items-center text-slate-400">
+                        <span><i class="fa-solid fa-map-pin text-rose-400 mr-1"></i> Koordinat Lokasi: <strong id="gpsStatus" class="text-slate-200">Belum diambil</strong></span>
+                        <input type="hidden" id="geoCoords" value="">
+                    </div>
+
                     <div class="grid grid-cols-2 gap-3 bg-slate-950 p-3 rounded-lg border border-slate-800 text-xs">
                         <div>
                             <span class="text-slate-400 block">Total Modal Unit Ini:</span>
@@ -109,10 +123,10 @@
                     </div>
                 </section>
 
-                <!-- 2. Form Inspeksi Mendalam -->
+                <!-- 2. Form Inspeksi Super Lengkap -->
                 <section class="bg-slate-800 p-5 rounded-xl border border-slate-700 shadow-md space-y-6">
                     <h2 class="text-lg font-bold text-slate-200 flex items-center gap-2 border-b border-slate-700 pb-2">
-                        <i class="fa-solid fa-list-check text-emerald-400"></i> Kertas Kerja Inspeksi Fisik
+                        <i class="fa-solid fa-list-check text-emerald-400"></i> Kertas Kerja Inspeksi Fisik Komprehensif
                     </h2>
 
                     <!-- Kategori 1: Surat-surat -->
@@ -133,31 +147,33 @@
                     <!-- Kategori 2: Mesin & Diesel/Bensin -->
                     <div class="space-y-2">
                         <h3 class="text-xs font-bold text-amber-400 uppercase tracking-wider flex items-center gap-1">
-                            <i class="fa-solid fa-gears"></i> 2. Kompartemen Mesin, Oli & Dapur Pacu
+                            <i class="fa-solid fa-gears"></i> 2. Dapur Pacu & Engine Mounting
                         </h3>
                         <div class="grid grid-cols-2 md:grid-cols-3 gap-2 text-xs">
-                            <label class="chk-label"><input type="checkbox" value="Oli Mesin (No Sludge)" class="chk-item"> Oli Mesin (No Sludge)</label>
+                            <label class="chk-label"><input type="checkbox" value="Engine Mounting Kanan/Kiri Halus" class="chk-item"> Engine Mounting Bagus</label>
+                            <label class="chk-label"><input type="checkbox" value="Oli Mesin Bersih/No Sludge" class="chk-item"> Oli Mesin (No Sludge)</label>
                             <label class="chk-label"><input type="checkbox" value="Suara Mesin Halus / Piston Normal" class="chk-item"> Suara Mesin Halus</label>
                             <label class="chk-label"><input type="checkbox" value="Injektor / Pengapian OK" class="chk-item"> Injektor / Pengapian OK</label>
                             <label class="chk-label"><input type="checkbox" value="EGR / Intake Sistem OK" class="chk-item"> EGR / Intake Sistem OK</label>
-                            <label class="chk-label"><input type="checkbox" value="Bebas Asap Ngebul / Hitam Pekat" class="chk-item"> Bebas Asap Ngebul/Hitam</label>
+                            <label class="chk-label"><input type="checkbox" value="Bebas Asap Ngebul/Hitam Pekat" class="chk-item"> Bebas Asap Ngebul/Hitam</label>
                             <label class="chk-label"><input type="checkbox" value="Radiator & Coolant OK" class="chk-item"> Radiator & Coolant OK</label>
-                            <label class="chk-label"><input type="checkbox" value="Alternator & Pengisian Aki OK" class="chk-item"> Alternator & Pengisian Aki</label>
-                            <label class="chk-label"><input type="checkbox" value="Turbocharger Bekerja Normal" class="chk-item"> Turbocharger (Jika Ada)</label>
-                            <label class="chk-label"><input type="checkbox" value="Bebas Rembes Oli Carter/Head" class="chk-item"> Bebas Rembes Oli Carter/Head</label>
+                            <label class="chk-label"><input type="checkbox" value="Alternator & Pengisian Aki OK" class="chk-item"> Alternator & Aki OK</label>
+                            <label class="chk-label"><input type="checkbox" value="Turbocharger Bekerja Normal" class="chk-item"> Turbocharger Normal</label>
+                            <label class="chk-label"><input type="checkbox" value="Bebas Rembes Oli Carter/Head" class="chk-item"> Bebas Rembes Oli</label>
                         </div>
                     </div>
 
-                    <!-- Kategori 3: Transmisi & Matik -->
+                    <!-- Kategori 3: Transmisi & Drivetrain -->
                     <div class="space-y-2">
                         <h3 class="text-xs font-bold text-amber-400 uppercase tracking-wider flex items-center gap-1">
                             <i class="fa-solid fa-code-branch"></i> 3. Transmisi & Drivetrain
                         </h3>
                         <div class="grid grid-cols-2 md:grid-cols-3 gap-2 text-xs">
                             <label class="chk-label"><input type="checkbox" value="Matik Bebas Jedug / Delay" class="chk-item"> Matik Bebas Jedug/Delay</label>
+                            <label class="chk-label"><input type="checkbox" value="Transmission Cooler OK" class="chk-item"> Cooler Transmisi OK</label>
                             <label class="chk-label"><input type="checkbox" value="Perpindahan Gigi Smooth" class="chk-item"> Transmisi Smooth</label>
                             <label class="chk-label"><input type="checkbox" value="Kondisi Oli Transmisi OK" class="chk-item"> Kondisi Oli Transmisi OK</label>
-                            <label class="chk-label"><input type="checkbox" value="Kopling / Deksel OK (Manual)" class="chk-item"> Kopling / Deksel (Manual)</label>
+                            <label class="chk-label"><input type="checkbox" value="Kopling / Deksel OK (Manual)" class="chk-item"> Kopling / Deksel OK</label>
                             <label class="chk-label"><input type="checkbox" value="Gardan Bebas Dengung" class="chk-item"> Gardan / As Roda OK</label>
                         </div>
                     </div>
@@ -169,8 +185,8 @@
                         </h3>
                         <div class="grid grid-cols-2 md:grid-cols-3 gap-2 text-xs">
                             <label class="chk-label"><input type="checkbox" value="Kompresor AC Halus" class="chk-item"> Kompresor AC Halus</label>
-                            <label class="chk-label"><input type="checkbox" value="Magnetic Clutch Bekerja Normal" class="chk-item"> Magnetic Clutch Bekerja</label>
-                            <label class="chk-label"><input type="checkbox" value="Kondensor AC Mulus" class="chk-item"> Kondensor AC Bagus</label>
+                            <label class="chk-label"><input type="checkbox" value="Magnetic Clutch Bekerja Normal" class="chk-item"> Magnetic Clutch Normal</label>
+                            <label class="chk-label"><input type="checkbox" value="Kondensor AC Mulus" class="chk-item"> Kondensor AC Mulus</label>
                             <label class="chk-label"><input type="checkbox" value="Evaporator Dingin & Bebas Bocor" class="chk-item"> Evaporator Dingin</label>
                             <label class="chk-label"><input type="checkbox" value="Blower & Hembusan Kuat" class="chk-item"> Blower & Hembusan Kuat</label>
                             <label class="chk-label"><input type="checkbox" value="Kabin Bebas Bau Apek" class="chk-item"> Kabin Bebas Bau Apek</label>
@@ -180,10 +196,10 @@
                     <!-- Kategori 5: Bodi & Rangka -->
                     <div class="space-y-2">
                         <h3 class="text-xs font-bold text-amber-400 uppercase tracking-wider flex items-center gap-1">
-                            <i class="fa-solid fa-shield-halved"></i> 5. Struktur Rangka & Kondisi Bodi
+                            <i class="fa-solid fa-shield-halved"></i> 5. Struktur Rangka & Bodi
                         </h3>
                         <div class="grid grid-cols-2 md:grid-cols-3 gap-2 text-xs">
-                            <label class="chk-label"><input type="checkbox" value="Apron Depan Utuh/Original" class="chk-item"> Apron Depan Utuh/Original</label>
+                            <label class="chk-label"><input type="checkbox" value="Apron Depan Utuh/Original" class="chk-item"> Apron Depan Original</label>
                             <label class="chk-label"><input type="checkbox" value="Bullhead & Tiang Radiator Utuh" class="chk-item"> Bullhead & Tiang Radiator</label>
                             <label class="chk-label"><input type="checkbox" value="Chassis / Floor Pan Bebas Banjir" class="chk-item"> Bebas Karat / Banjir</label>
                             <label class="chk-label"><input type="checkbox" value="Nat & Sealer Pintu Ori" class="chk-item"> Nat & Sealer Pintu Ori</label>
@@ -192,39 +208,49 @@
                         </div>
                     </div>
 
-                    <!-- Kategori 6: Kaki-kaki & Pengereman -->
+                    <!-- Kategori 6: Kaki-kaki & Suspension -->
                     <div class="space-y-2">
                         <h3 class="text-xs font-bold text-amber-400 uppercase tracking-wider flex items-center gap-1">
-                            <i class="fa-solid fa-compact-disc"></i> 6. Kaki-Kaki, Suspension & Rem
+                            <i class="fa-solid fa-compact-disc"></i> 6. Kaki-Kaki, Rem & Kemudi
                         </h3>
                         <div class="grid grid-cols-2 md:grid-cols-3 gap-2 text-xs">
                             <label class="chk-label"><input type="checkbox" value="Tie Rod & Long Tie Rod Fit" class="chk-item"> Tie Rod & Long Tie Rod</label>
                             <label class="chk-label"><input type="checkbox" value="Bushing Arm / Link Stabil OK" class="chk-item"> Bushing Arm / Link Stabil</label>
                             <label class="chk-label"><input type="checkbox" value="Shockbreaker Kering/No Leak" class="chk-item"> Shockbreaker Kering</label>
-                            <label class="chk-label"><input type="checkbox" value="Rack Steer No Bunyi" class="chk-item"> Rack Steer No Bunyi</label>
-                            <label class="chk-label"><input type="checkbox" value="Kampas Rem & Piringan Disc OK" class="chk-item"> Kampas Rem & Piringan Disc</label>
-                            <label class="chk-label"><input type="checkbox" value="Kondisi Ban Tebal (>70%)" class="chk-item"> Kondisi Ban Tebal</label>
+                            <label class="chk-label"><input type="checkbox" value="Rack Steer EPS/Hydraulic No Bocor" class="chk-item"> Rack Steer No Leak/Bunyi</label>
+                            <label class="chk-label"><input type="checkbox" value="Kampas Rem & Disc OK" class="chk-item"> Kampas Rem & Disc OK</label>
+                            <label class="chk-label"><input type="checkbox" value="Ban 4 Unit Tebal (>70%)" class="chk-item"> Ban 4 Unit Tebal</label>
+                            <label class="chk-label"><input type="checkbox" value="Ban Serep & Toolkit Lengkap" class="chk-item"> Ban Serep & Toolkit Ada</label>
                         </div>
                     </div>
 
                     <!-- Kategori 7: Interior & Elekronik -->
                     <div class="space-y-2">
                         <h3 class="text-xs font-bold text-amber-400 uppercase tracking-wider flex items-center gap-1">
-                            <i class="fa-solid fa-tv"></i> 7. Kabin Interior & Kelengkapan Audio
+                            <i class="fa-solid fa-tv"></i> 7. Kabin Interior & Electrical
                         </h3>
                         <div class="grid grid-cols-2 md:grid-cols-3 gap-2 text-xs">
                             <label class="chk-label"><input type="checkbox" value="Kulit Setir & Knob Shift Bagus" class="chk-item"> Kulit Setir & Knob Shift</label>
                             <label class="chk-label"><input type="checkbox" value="Jok Busa / Reclining OK" class="chk-item"> Jok Busa / Reclining OK</label>
                             <label class="chk-label"><input type="checkbox" value="Doortrim & Plafon Bersih" class="chk-item"> Doortrim & Plafon Bersih</label>
                             <label class="chk-label"><input type="checkbox" value="Audio Headunit / TV OK" class="chk-item"> Audio Headunit / TV OK</label>
-                            <label class="chk-label"><input type="checkbox" value="Power Window / Spion Retract OK" class="chk-item"> Power Window / Spion Retract</label>
-                            <label class="chk-label"><input type="checkbox" value="Cluster Speedo No Error" class="chk-item"> Cluster Speedo No Error</label>
+                            <label class="chk-label"><input type="checkbox" value="Power Window / Retract OK" class="chk-item"> Power Window / Retract</label>
+                            <label class="chk-label"><input type="checkbox" value="Airbag & Modul ABS No Error" class="chk-item"> Airbag & ABS No Error</label>
+                            <label class="chk-label"><input type="checkbox" value="Sunroof / Panoramic Bekerja Normal" class="chk-item"> Sunroof (Jika Ada) OK</label>
                         </div>
                     </div>
 
-                    <button type="button" onclick="saveUnitData()" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-3 rounded-xl transition-all shadow-lg flex items-center justify-center gap-2 text-sm">
-                        <i class="fa-solid fa-cloud-arrow-up"></i> Simpan Unit Ke Cloud Database
-                    </button>
+                    <!-- Form PIN Keamanan -->
+                    <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-2">
+                        <label class="block text-xs text-amber-400 font-bold"><i class="fa-solid fa-lock mr-1"></i> Masukkan PIN Keamanan untuk Menyimpan Data:</label>
+                        <div class="flex gap-2">
+                            <input type="password" id="userPin" placeholder="PIN Rahasia (Default: 1234)" class="bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-xs text-slate-100 focus:outline-none focus:border-emerald-500 w-full">
+                            <button type="button" onclick="saveUnitData()" class="bg-emerald-600 hover:bg-emerald-500 text-white font-bold px-6 py-2.5 rounded-lg transition-all shadow-lg flex items-center gap-2 text-xs whitespace-nowrap">
+                                <i class="fa-solid fa-cloud-arrow-up"></i> Simpan Unit
+                            </button>
+                        </div>
+                    </div>
+
                 </section>
 
             </div>
@@ -268,22 +294,27 @@
         }
     </style>
 
-    <!-- Firebase Script -->
+    <!-- Firebase & Application Script -->
     <script>
-        // PASTE FIREBASE CONFIG ANDA DI BAWAH INI:
+        // CONFIG FIREBASE ANDA
         const firebaseConfig = {
-  apiKey: "AIzaSyC-JHLnaTkXZ0hx4GQ3xh4WnXah95HvWmU",
-  authDomain: "fourycarsdb.firebaseapp.com",
-  projectId: "fourycarsdb",
-  storageBucket: "fourycarsdb.firebasestorage.app",
-  messagingSenderId: "317295553949",
-  appId: "1:317295553949:web:ec2f6062bde85afadcd374",
-  measurementId: "G-HQPZ29H0W9"
-};
+            apiKey: "AIzaSyC-JHLnaTkXZ0hx4GQ3xh4WnXah95HvWmU",
+            authDomain: "fourycarsdb.firebaseapp.com",
+            projectId: "fourycarsdb",
+            storageBucket: "fourycarsdb.firebasestorage.app",
+            messagingSenderId: "317295553949",
+            appId: "1:317295553949:web:ec2f6062bde85afadcd374",
+            measurementId: "G-HQPZ29H0W9"
+        };
+
+        // PIN KEAMANAN DEFAULT (Dapat Anda Ubah)
+        const MASTER_PIN = "1234";
 
         // Initialize Firebase
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
+
+        let cachedCarsData = [];
 
         function showToast(msg) {
             const toast = document.getElementById('toast');
@@ -292,6 +323,27 @@
             setTimeout(() => {
                 toast.classList.add('hidden');
             }, 3000);
+        }
+
+        function getGPSLocation() {
+            if (navigator.geolocation) {
+                document.getElementById('gpsStatus').innerText = "Sedang melacak lokasi...";
+                navigator.geolocation.getCurrentPosition(
+                    (position) => {
+                        const lat = position.coords.latitude;
+                        const lng = position.coords.longitude;
+                        document.getElementById('geoCoords').value = `${lat},${lng}`;
+                        document.getElementById('gpsStatus').innerHTML = `<a href="https://maps.google.com/?q=${lat},${lng}" target="_blank" class="text-emerald-400 underline">${lat.toFixed(5)}, ${lng.toFixed(5)} (Buka Maps)</a>`;
+                        showToast("📍 Lokasi GPS Berhasil Ditangkap!");
+                    },
+                    (error) => {
+                        document.getElementById('gpsStatus').innerText = "Gagal mengambil GPS.";
+                        showToast("⚠️ Izin lokasi ditolak browser.");
+                    }
+                );
+            } else {
+                alert("Browser Anda tidak mendukung fitur Geolocation GPS.");
+            }
         }
 
         function calculateFinancials() {
@@ -309,10 +361,17 @@
         }
 
         function saveUnitData() {
+            const pinInput = document.getElementById('userPin').value;
+            if (pinInput !== MASTER_PIN) {
+                alert("❌ PIN Salah! Akses ditolak.");
+                return;
+            }
+
             const carNameInput = document.getElementById('carName');
             const carName = carNameInput ? carNameInput.value.trim() : '';
             const carNopol = document.getElementById('carNopol').value;
             const carSpec = document.getElementById('carSpec').value;
+            const coords = document.getElementById('geoCoords').value;
             const fin = calculateFinancials();
 
             if (carName === '') {
@@ -336,11 +395,11 @@
                 totalModal: fin.totalModal,
                 profit: fin.profit,
                 checklist: checkedPoints,
+                coords: coords,
                 createdAt: firebase.firestore.FieldValue.serverTimestamp(),
                 timestamp: new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' })
             };
 
-            // Simpan langsung ke Server Google Firebase
             db.collection("cars").add(newUnit)
             .then(() => {
                 showToast('✅ Berhasil Tersimpan di Server Google Cloud!');
@@ -358,20 +417,27 @@
             document.getElementById('buyPrice').value = '';
             document.getElementById('repairCost').value = '';
             document.getElementById('sellPrice').value = '';
+            document.getElementById('userPin').value = '';
+            document.getElementById('geoCoords').value = '';
+            document.getElementById('gpsStatus').innerText = 'Belum diambil';
             document.querySelectorAll('.chk-item').forEach(chk => chk.checked = false);
             calculateFinancials();
         }
 
         function deleteUnit(docId) {
-            if (confirm('Apakah Anda yakin ingin menghapus data unit ini dari Cloud Database?')) {
-                db.collection("cars").doc(docId).delete()
-                .then(() => {
-                    showToast('🗑️ Data berhasil dihapus dari Cloud.');
-                });
+            const pin = prompt("Masukkan PIN Keamanan untuk menghapus unit ini:");
+            if (pin !== MASTER_PIN) {
+                alert("❌ PIN Salah! Data tidak dapat dihapus.");
+                return;
             }
+
+            db.collection("cars").doc(docId).delete()
+            .then(() => {
+                showToast('🗑️ Data berhasil dihapus.');
+            });
         }
 
-        // Realtime Listener (Otomatis Update tanpa perlu Refresh)
+        // Realtime Listener Firebase
         db.collection("cars").orderBy("createdAt", "desc").onSnapshot((snapshot) => {
             const container = document.getElementById('unitListContainer');
             container.innerHTML = '';
@@ -380,11 +446,14 @@
             let sumOmset = 0;
             let sumProfit = 0;
             let count = 0;
+            cachedCarsData = [];
 
             snapshot.forEach((doc) => {
                 count++;
                 const item = doc.data();
                 const docId = doc.id;
+
+                cachedCarsData.push(item);
 
                 sumModal += item.totalModal || 0;
                 sumOmset += item.sellPrice || 0;
@@ -419,6 +488,8 @@
                         </div>
                     </div>
 
+                    ${item.coords ? `<div class="text-[10px] text-slate-400"><i class="fa-solid fa-location-dot text-rose-400 mr-1"></i><a href="https://maps.google.com/?q=${item.coords}" target="_blank" class="text-blue-400 underline">Lihat Peta Lokasi Pembelian</a></div>` : ''}
+
                     <div>
                         <span class="text-[10px] text-emerald-400 font-bold uppercase tracking-wider block mb-1">
                             Poin Lolos (${item.checklist ? item.checklist.length : 0}):
@@ -440,6 +511,40 @@
             document.getElementById('summaryOmset').innerText = 'Rp ' + sumOmset.toLocaleString('id-ID');
             document.getElementById('summaryProfit').innerText = 'Rp ' + sumProfit.toLocaleString('id-ID');
         });
+
+        // Fitur Export ke Excel (Format CSV)
+        function exportToCSV() {
+            if (cachedCarsData.length === 0) {
+                alert("Belum ada data unit untuk di-export.");
+                return;
+            }
+
+            let csvContent = "data:text/csv;charset=utf-8,Nama Mobil,Nopol,Spesifikasi,Harga Beli,Biaya PR,Total Modal,Target Jual,Estimasi Profit,Koordinat GPS,Tanggal Inspeksi\n";
+
+            cachedCarsData.forEach(item => {
+                const row = [
+                    `"${item.carName || ''}"`,
+                    `"${item.carNopol || ''}"`,
+                    `"${item.carSpec || ''}"`,
+                    item.buyPrice || 0,
+                    item.repairCost || 0,
+                    item.totalModal || 0,
+                    item.sellPrice || 0,
+                    item.profit || 0,
+                    `"${item.coords || ''}"`,
+                    `"${item.timestamp || ''}"`
+                ].join(",");
+                csvContent += row + "\n";
+            });
+
+            const encodedUri = encodeURI(csvContent);
+            const link = document.createElement("a");
+            link.setAttribute("href", encodedUri);
+            link.setAttribute("download", `Laporan_Showroom_${Date.now()}.csv`);
+            document.body.appendChild(link);
+            link.click();
+            link.remove();
+        }
     </script>
 </body>
 </html>
