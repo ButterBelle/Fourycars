@@ -13,6 +13,12 @@
 
     <div class="max-w-7xl mx-auto space-y-6">
         
+        <!-- Toast Notification Area -->
+        <div id="toast" class="fixed top-5 right-5 z-50 hidden bg-emerald-600 text-white px-5 py-3 rounded-xl shadow-2xl flex items-center gap-3 border border-emerald-400">
+            <i class="fa-solid fa-circle-check text-xl"></i>
+            <span id="toastMsg" class="text-sm font-semibold">Data berhasil disimpan!</span>
+        </div>
+
         <!-- Dashboard Header & Keuangan -->
         <header class="bg-slate-800 p-6 rounded-2xl border border-slate-700 shadow-xl space-y-4">
             <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b border-slate-700 pb-4">
@@ -20,11 +26,11 @@
                     <h1 class="text-2xl md:text-3xl font-extrabold text-emerald-400 flex items-center gap-2">
                         <i class="fa-solid fa-car-tunnel"></i> Inspector & Showroom Ledger
                     </h1>
-                    <p class="text-slate-400 text-xs md:text-sm">Sistem Manajemen Inspeksi Kendaraan & Rekapitulasi Keuangan Proyek</p>
+                    <p class="text-slate-400 text-xs md:text-sm">Database Inspeksi Kendaraan & Rekapitulasi Keuangan (IndexedDB Engine)</p>
                 </div>
                 <div class="flex gap-2">
                     <button onclick="exportData()" class="bg-slate-700 hover:bg-slate-600 text-xs px-3 py-2 rounded-lg border border-slate-600 flex items-center gap-1">
-                        <i class="fa-solid fa-download"></i> Backup Data
+                        <i class="fa-solid fa-download"></i> Backup JSON
                     </button>
                     <button onclick="resetForm()" class="bg-amber-600 hover:bg-amber-500 text-xs px-3 py-2 rounded-lg text-white flex items-center gap-1">
                         <i class="fa-solid fa-rotate-left"></i> Reset Form
@@ -261,14 +267,38 @@
         }
     </style>
 
-    <!-- Application Script -->
+    <!-- IndexedDB & Logic Script -->
     <script>
-        let database = [];
-        try {
-            database = JSON.parse(localStorage.getItem('showroom_inspector_db')) || [];
-        } catch (e) {
-            console.error("Gagal membaca LocalStorage:", e);
-            database = [];
+        let db;
+        const dbName = "ShowroomGarageDB";
+        const storeName = "inspection_units";
+
+        // Inisialisasi Database Bawaan Browser (IndexedDB)
+        const request = indexedDB.open(dbName, 1);
+
+        request.onupgradeneeded = function(e) {
+            db = e.target.result;
+            if (!db.objectStoreNames.contains(storeName)) {
+                db.createObjectStore(storeName, { keyPath: "id" });
+            }
+        };
+
+        request.onsuccess = function(e) {
+            db = e.target.result;
+            renderDashboard();
+        };
+
+        request.onerror = function(e) {
+            console.error("IndexedDB Gagal Diakses:", e);
+        };
+
+        function showToast(msg) {
+            const toast = document.getElementById('toast');
+            document.getElementById('toastMsg').innerText = msg;
+            toast.classList.remove('hidden');
+            setTimeout(() => {
+                toast.classList.add('hidden');
+            }, 3000);
         }
 
         function calculateFinancials() {
@@ -292,20 +322,17 @@
             const carSpec = document.getElementById('carSpec').value;
             const fin = calculateFinancials();
 
-            // Validasi Input Wajib
             if (carName === '') {
-                alert('⚠️ Kolom "Nama / Tipe Mobil" wajib diisi terlebih dahulu!');
+                showToast('⚠️ Nama / Tipe Mobil wajib diisi!');
                 carNameInput.focus();
                 return;
             }
 
-            // Mengambil semua checkbox yang dicentang
             const checkedPoints = [];
             document.querySelectorAll('.chk-item:checked').forEach(chk => {
                 checkedPoints.push(chk.value);
             });
 
-            // Objek Data Baru
             const newUnit = {
                 id: Date.now(),
                 carName: carName,
@@ -320,18 +347,19 @@
                 timestamp: new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' })
             };
 
-            // Simpan ke Array & LocalStorage
-            database.push(newUnit);
-            try {
-                localStorage.setItem('showroom_inspector_db', JSON.stringify(database));
-                alert('✅ Data unit "' + carName + '" BERHASIL TERSIMPAN!');
-            } catch (e) {
-                alert('❌ Gagal menyimpan data ke memori browser.');
-                console.error(e);
-            }
-            
-            resetForm();
-            renderDashboard();
+            const tx = db.transaction(storeName, "readwrite");
+            const store = tx.objectStore(storeName);
+            store.add(newUnit);
+
+            tx.oncomplete = function() {
+                showToast('✅ Data unit "' + carName + '" BERHASIL TERSIMPAN!');
+                resetForm();
+                renderDashboard();
+            };
+
+            tx.onerror = function() {
+                showToast('❌ Gagal menyimpan data ke database.');
+            };
         }
 
         function resetForm() {
@@ -347,101 +375,114 @@
 
         function deleteUnit(id) {
             if (confirm('Apakah Anda yakin ingin menghapus data unit ini?')) {
-                database = database.filter(item => item.id !== id);
-                localStorage.setItem('showroom_inspector_db', JSON.stringify(database));
-                renderDashboard();
+                const tx = db.transaction(storeName, "readwrite");
+                const store = tx.objectStore(storeName);
+                store.delete(id);
+
+                tx.oncomplete = function() {
+                    showToast('🗑️ Data unit berhasil dihapus.');
+                    renderDashboard();
+                };
             }
         }
 
         function renderDashboard() {
+            if (!db) return;
+
             const container = document.getElementById('unitListContainer');
-            if (!container) return;
-            
             container.innerHTML = '';
 
-            let sumModal = 0;
-            let sumOmset = 0;
-            let sumProfit = 0;
+            const tx = db.transaction(storeName, "readonly");
+            const store = tx.objectStore(storeName);
+            const req = store.getAll();
 
-            document.getElementById('unitBadgeCount').innerText = database.length + ' Unit';
+            req.onsuccess = function() {
+                const database = req.result || [];
+                let sumModal = 0;
+                let sumOmset = 0;
+                let sumProfit = 0;
 
-            if (database.length === 0) {
-                container.innerHTML = `
-                    <div class="text-center py-8 text-slate-500 space-y-2">
-                        <i class="fa-solid fa-folder-open text-3xl"></i>
-                        <p class="text-xs">Belum ada unit tersimpan.</p>
-                    </div>`;
-            }
+                document.getElementById('unitBadgeCount').innerText = database.length + ' Unit';
 
-            database.forEach(item => {
-                sumModal += item.totalModal;
-                sumOmset += item.sellPrice;
-                sumProfit += item.profit;
+                if (database.length === 0) {
+                    container.innerHTML = `
+                        <div class="text-center py-8 text-slate-500 space-y-2">
+                            <i class="fa-solid fa-folder-open text-3xl"></i>
+                            <p class="text-xs">Belum ada unit tersimpan di database browser ini.</p>
+                        </div>`;
+                }
 
-                const card = document.createElement('div');
-                card.className = 'bg-slate-900 border border-slate-700 p-4 rounded-xl space-y-3 shadow-sm';
-                
-                card.innerHTML = `
-                    <div class="flex justify-between items-start border-b border-slate-800 pb-2">
+                database.forEach(item => {
+                    sumModal += item.totalModal;
+                    sumOmset += item.sellPrice;
+                    sumProfit += item.profit;
+
+                    const card = document.createElement('div');
+                    card.className = 'bg-slate-900 border border-slate-700 p-4 rounded-xl space-y-3 shadow-sm';
+                    
+                    card.innerHTML = `
+                        <div class="flex justify-between items-start border-b border-slate-800 pb-2">
+                            <div>
+                                <h4 class="font-bold text-slate-100 text-sm">${item.carName}</h4>
+                                <span class="text-[11px] text-slate-400 block">${item.carNopol || 'Tanpa Nopol'} • ${item.carSpec || '-'}</span>
+                            </div>
+                            <button onclick="deleteUnit(${item.id})" class="text-rose-400 hover:text-rose-300 text-xs p-1">
+                                <i class="fa-solid fa-trash-can"></i>
+                            </button>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-2 text-xs bg-slate-950 p-2.5 rounded-lg border border-slate-800/80">
+                            <div>
+                                <span class="text-slate-500 block text-[10px]">Total Modal</span>
+                                <span class="font-bold text-amber-400">Rp ${item.totalModal.toLocaleString('id-ID')}</span>
+                            </div>
+                            <div>
+                                <span class="text-slate-500 block text-[10px]">Target Jual</span>
+                                <span class="font-bold text-blue-400">Rp ${item.sellPrice.toLocaleString('id-ID')}</span>
+                            </div>
+                            <div class="col-span-2 border-t border-slate-800 pt-1 flex justify-between items-center">
+                                <span class="text-slate-400 text-[10px]">Proyeksi Profit:</span>
+                                <span class="font-bold text-emerald-400">Rp ${item.profit.toLocaleString('id-ID')}</span>
+                            </div>
+                        </div>
+
                         <div>
-                            <h4 class="font-bold text-slate-100 text-sm">${item.carName}</h4>
-                            <span class="text-[11px] text-slate-400 block">${item.carNopol || 'Tanpa Nopol'} • ${item.carSpec || '-'}</span>
+                            <span class="text-[10px] text-emerald-400 font-bold uppercase tracking-wider block mb-1">
+                                Poin Lolos (${item.checklist ? item.checklist.length : 0}):
+                            </span>
+                            <div class="flex flex-wrap gap-1 max-h-24 overflow-y-auto pr-1">
+                                ${item.checklist && item.checklist.length > 0 ? item.checklist.map(point => `<span class="bg-slate-800 text-slate-300 text-[10px] px-2 py-0.5 rounded border border-slate-700">${point}</span>`).join('') : '<span class="text-[10px] text-slate-500">Tidak ada item tercentang</span>'}
+                            </div>
                         </div>
-                        <button onclick="deleteUnit(${item.id})" class="text-rose-400 hover:text-rose-300 text-xs p-1">
-                            <i class="fa-solid fa-trash-can"></i>
-                        </button>
-                    </div>
 
-                    <div class="grid grid-cols-2 gap-2 text-xs bg-slate-950 p-2.5 rounded-lg border border-slate-800/80">
-                        <div>
-                            <span class="text-slate-500 block text-[10px]">Total Modal</span>
-                            <span class="font-bold text-amber-400">Rp ${item.totalModal.toLocaleString('id-ID')}</span>
-                        </div>
-                        <div>
-                            <span class="text-slate-500 block text-[10px]">Target Jual</span>
-                            <span class="font-bold text-blue-400">Rp ${item.sellPrice.toLocaleString('id-ID')}</span>
-                        </div>
-                        <div class="col-span-2 border-t border-slate-800 pt-1 flex justify-between items-center">
-                            <span class="text-slate-400 text-[10px]">Proyeksi Profit:</span>
-                            <span class="font-bold text-emerald-400">Rp ${item.profit.toLocaleString('id-ID')}</span>
-                        </div>
-                    </div>
+                        <div class="text-[10px] text-slate-500 text-right">Tercatat: ${item.timestamp}</div>
+                    `;
 
-                    <div>
-                        <span class="text-[10px] text-emerald-400 font-bold uppercase tracking-wider block mb-1">
-                            Poin Lolos (${item.checklist ? item.checklist.length : 0}):
-                        </span>
-                        <div class="flex flex-wrap gap-1 max-h-24 overflow-y-auto pr-1">
-                            ${item.checklist && item.checklist.length > 0 ? item.checklist.map(point => `<span class="bg-slate-800 text-slate-300 text-[10px] px-2 py-0.5 rounded border border-slate-700">${point}</span>`).join('') : '<span class="text-[10px] text-slate-500">Tidak ada item tercentang</span>'}
-                        </div>
-                    </div>
+                    container.appendChild(card);
+                });
 
-                    <div class="text-[10px] text-slate-500 text-right">Tercatat: ${item.timestamp}</div>
-                `;
-
-                container.appendChild(card);
-            });
-
-            document.getElementById('summaryTotalUnit').innerText = database.length + ' Unit';
-            document.getElementById('summaryModal').innerText = 'Rp ' + sumModal.toLocaleString('id-ID');
-            document.getElementById('summaryOmset').innerText = 'Rp ' + sumOmset.toLocaleString('id-ID');
-            document.getElementById('summaryProfit').innerText = 'Rp ' + sumProfit.toLocaleString('id-ID');
+                document.getElementById('summaryTotalUnit').innerText = database.length + ' Unit';
+                document.getElementById('summaryModal').innerText = 'Rp ' + sumModal.toLocaleString('id-ID');
+                document.getElementById('summaryOmset').innerText = 'Rp ' + sumOmset.toLocaleString('id-ID');
+                document.getElementById('summaryProfit').innerText = 'Rp ' + sumProfit.toLocaleString('id-ID');
+            };
         }
 
         function exportData() {
-            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(database, null, 2));
-            const downloadAnchor = document.createElement('a');
-            downloadAnchor.setAttribute("href", dataStr);
-            downloadAnchor.setAttribute("download", `backup_showroom_${Date.now()}.json`);
-            document.body.appendChild(downloadAnchor);
-            downloadAnchor.click();
-            downloadAnchor.remove();
-        }
+            const tx = db.transaction(storeName, "readonly");
+            const store = tx.objectStore(storeName);
+            const req = store.getAll();
 
-        // Render otomatis saat halaman pertama kali dibuka
-        window.onload = function() {
-            renderDashboard();
-        };
+            req.onsuccess = function() {
+                const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(req.result, null, 2));
+                const downloadAnchor = document.createElement('a');
+                downloadAnchor.setAttribute("href", dataStr);
+                downloadAnchor.setAttribute("download", `backup_showroom_${Date.now()}.json`);
+                document.body.appendChild(downloadAnchor);
+                downloadAnchor.click();
+                downloadAnchor.remove();
+            };
+        }
     </script>
 </body>
 </html>
