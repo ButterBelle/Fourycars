@@ -66,7 +66,7 @@
                     </h2>
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
                         <div>
-                            <label class="block text-xs text-slate-400 mb-1">Nama / Tipe Mobil</label>
+                            <label class="block text-xs text-slate-400 mb-1">Nama / Tipe Mobil <span class="text-rose-500">*</span></label>
                             <input type="text" id="carName" placeholder="Pajero Sport Dakar / Innova Reborn" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-xs text-slate-100 focus:outline-none focus:border-emerald-500">
                         </div>
                         <div>
@@ -78,7 +78,7 @@
                             <input type="text" id="carSpec" placeholder="2019 / Diesel" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-xs text-slate-100 focus:outline-none focus:border-emerald-500">
                         </div>
                         <div>
-                            <label class="block text-xs text-slate-400 mb-1">Harga Beli Beli / Open (Rp)</label>
+                            <label class="block text-xs text-slate-400 mb-1">Harga Beli / Open (Rp)</label>
                             <input type="number" id="buyPrice" oninput="calculateFinancials()" placeholder="0" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-xs text-slate-100 focus:outline-none focus:border-emerald-500">
                         </div>
                         <div>
@@ -114,11 +114,11 @@
                             <i class="fa-solid fa-folder-open"></i> 1. Keabsahan & Legalitas Surat
                         </h3>
                         <div class="grid grid-cols-2 md:grid-cols-3 gap-2 text-xs">
-                            <label class="chk-label"><input type="checkbox" value="STNK Asli & On" class="chk-item"> STNK Asli & Pajak On</label>
+                            <label class="chk-label"><input type="checkbox" value="STNK Asli & Pajak On" class="chk-item"> STNK Asli & Pajak On</label>
                             <label class="chk-label"><input type="checkbox" value="BPKB & Faktur Lengkap" class="chk-item"> BPKB & Faktur Lengkap</label>
-                            <label class="chk-label"><input type="checkbox" value="Cek Fisik Samsat Akurat" class="chk-item"> Cek Fisik No. Rangka/Mesin</label>
-                            <label class="chk-label"><input type="checkbox" value="Bebas Blokir/Tilang Elektronik" class="chk-item"> Bebas Blokir / ETLE</label>
-                            <label class="chk-label"><input type="checkbox" value="Kunci Serep Ada" class="chk-item"> Kunci Serep Tersedia</label>
+                            <label class="chk-label"><input type="checkbox" value="Cek Fisik No. Rangka/Mesin Akurat" class="chk-item"> Cek Fisik No. Rangka/Mesin</label>
+                            <label class="chk-label"><input type="checkbox" value="Bebas Blokir / ETLE" class="chk-item"> Bebas Blokir / ETLE</label>
+                            <label class="chk-label"><input type="checkbox" value="Kunci Serep Tersedia" class="chk-item"> Kunci Serep Tersedia</label>
                             <label class="chk-label"><input type="checkbox" value="Buku Servis & Manual Ada" class="chk-item"> Buku Servis/Manual</label>
                         </div>
                     </div>
@@ -129,15 +129,15 @@
                             <i class="fa-solid fa-gears"></i> 2. Kompartemen Mesin, Oli & Dapur Pacu
                         </h3>
                         <div class="grid grid-cols-2 md:grid-cols-3 gap-2 text-xs">
-                            <label class="chk-label"><input type="checkbox" value="Oli Mesin Bersih/Bebas Sludge" class="chk-item"> Oli Mesin (No Sludge)</label>
-                            <label class="chk-label"><input type="checkbox" value="Suara Mesin Halus/Piston Normal" class="chk-item"> Suara Mesin Halus</label>
-                            <label class="chk-label"><input type="checkbox" value="Injektor Normal/Bebas Ngincang" class="chk-item"> Injektor / Pengapian OK</label>
-                            <label class="chk-label"><input type="checkbox" value="EGR / Intake Clean" class="chk-item"> EGR / Intake Sistem OK</label>
-                            <label class="chk-label"><input type="checkbox" value="Bebas Asap Ngebul / Asap Hitam Pekat" class="chk-item"> Bebas Asap Ngebul/Hitam</label>
-                            <label class="chk-label"><input type="checkbox" value="Radiator & Coolant Bebas Bocor" class="chk-item"> Radiator & Coolant OK</label>
-                            <label class="chk-label"><input type="checkbox" value="Alternator & Pengisian Aki Good" class="chk-item"> Alternator & Pengisian Aki</label>
+                            <label class="chk-label"><input type="checkbox" value="Oli Mesin (No Sludge)" class="chk-item"> Oli Mesin (No Sludge)</label>
+                            <label class="chk-label"><input type="checkbox" value="Suara Mesin Halus / Piston Normal" class="chk-item"> Suara Mesin Halus</label>
+                            <label class="chk-label"><input type="checkbox" value="Injektor / Pengapian OK" class="chk-item"> Injektor / Pengapian OK</label>
+                            <label class="chk-label"><input type="checkbox" value="EGR / Intake Sistem OK" class="chk-item"> EGR / Intake Sistem OK</label>
+                            <label class="chk-label"><input type="checkbox" value="Bebas Asap Ngebul / Hitam Pekat" class="chk-item"> Bebas Asap Ngebul/Hitam</label>
+                            <label class="chk-label"><input type="checkbox" value="Radiator & Coolant OK" class="chk-item"> Radiator & Coolant OK</label>
+                            <label class="chk-label"><input type="checkbox" value="Alternator & Pengisian Aki OK" class="chk-item"> Alternator & Pengisian Aki</label>
                             <label class="chk-label"><input type="checkbox" value="Turbocharger Bekerja Normal" class="chk-item"> Turbocharger (Jika Ada)</label>
-                            <label class="chk-label"><input type="checkbox" value="Bebas Rembesan Oli Head/Carter" class="chk-item"> Bebas Rembes Oli Carter/Head</label>
+                            <label class="chk-label"><input type="checkbox" value="Bebas Rembes Oli Carter/Head" class="chk-item"> Bebas Rembes Oli Carter/Head</label>
                         </div>
                     </div>
 
@@ -147,10 +147,10 @@
                             <i class="fa-solid fa-code-branch"></i> 3. Transmisi & Drivetrain
                         </h3>
                         <div class="grid grid-cols-2 md:grid-cols-3 gap-2 text-xs">
-                            <label class="chk-label"><input type="checkbox" value="Matik Bebas Jedug / Delay P-R-D" class="chk-item"> Matik Bebas Jedug/Delay</label>
+                            <label class="chk-label"><input type="checkbox" value="Matik Bebas Jedug / Delay" class="chk-item"> Matik Bebas Jedug/Delay</label>
                             <label class="chk-label"><input type="checkbox" value="Perpindahan Gigi Smooth" class="chk-item"> Transmisi Smooth</label>
-                            <label class="chk-label"><input type="checkbox" value="Oli Transmisi Bening/Merah" class="chk-item"> Kondisi Oli Transmisi OK</label>
-                            <label class="chk-label"><input type="checkbox" value="Kopling Manual Tidak Selip" class="chk-item"> Kopling / Deksel (Manual)</label>
+                            <label class="chk-label"><input type="checkbox" value="Kondisi Oli Transmisi OK" class="chk-item"> Kondisi Oli Transmisi OK</label>
+                            <label class="chk-label"><input type="checkbox" value="Kopling / Deksel OK (Manual)" class="chk-item"> Kopling / Deksel (Manual)</label>
                             <label class="chk-label"><input type="checkbox" value="Gardan Bebas Dengung" class="chk-item"> Gardan / As Roda OK</label>
                         </div>
                     </div>
@@ -162,11 +162,11 @@
                         </h3>
                         <div class="grid grid-cols-2 md:grid-cols-3 gap-2 text-xs">
                             <label class="chk-label"><input type="checkbox" value="Kompresor AC Halus" class="chk-item"> Kompresor AC Halus</label>
-                            <label class="chk-label"><input type="checkbox" value="Magnetic Clutch Ceklek Normal" class="chk-item"> Magnetic Clutch Bekerja</label>
+                            <label class="chk-label"><input type="checkbox" value="Magnetic Clutch Bekerja Normal" class="chk-item"> Magnetic Clutch Bekerja</label>
                             <label class="chk-label"><input type="checkbox" value="Kondensor AC Mulus" class="chk-item"> Kondensor AC Bagus</label>
-                            <label class="chk-label"><input type="checkbox" value="Evaporator Dingin / Bebas Bocor" class="chk-item"> Evaporator Dingin</label>
-                            <label class="chk-label"><input type="checkbox" value="Blower & Hembusan AC Menggigit" class="chk-item"> Blower & Hembusan Kuat</label>
-                            <label class="chk-label"><input type="checkbox" value="Bebas Bau Apek / Lembab" class="chk-item"> Kabin Bebas Bau Apek</label>
+                            <label class="chk-label"><input type="checkbox" value="Evaporator Dingin & Bebas Bocor" class="chk-item"> Evaporator Dingin</label>
+                            <label class="chk-label"><input type="checkbox" value="Blower & Hembusan Kuat" class="chk-item"> Blower & Hembusan Kuat</label>
+                            <label class="chk-label"><input type="checkbox" value="Kabin Bebas Bau Apek" class="chk-item"> Kabin Bebas Bau Apek</label>
                         </div>
                     </div>
 
@@ -176,12 +176,12 @@
                             <i class="fa-solid fa-shield-halved"></i> 5. Struktur Rangka & Kondisi Bodi
                         </h3>
                         <div class="grid grid-cols-2 md:grid-cols-3 gap-2 text-xs">
-                            <label class="chk-label"><input type="checkbox" value="Apron Depan Utuh (No Tabrak)" class="chk-item"> Apron Depan Utuh/Original</label>
+                            <label class="chk-label"><input type="checkbox" value="Apron Depan Utuh/Original" class="chk-item"> Apron Depan Utuh/Original</label>
                             <label class="chk-label"><input type="checkbox" value="Bullhead & Tiang Radiator Utuh" class="chk-item"> Bullhead & Tiang Radiator</label>
                             <label class="chk-label"><input type="checkbox" value="Chassis / Floor Pan Bebas Banjir" class="chk-item"> Bebas Karat / Banjir</label>
-                            <label class="chk-label"><input type="checkbox" value="Nat & Sealer Pintu Original" class="chk-item"> Nat & Sealer Pintu Ori</label>
-                            <label class="chk-label"><input type="checkbox" value="Bebas Bekas Potongan Rangka" class="chk-item"> Rangka Bebas Bekas Laka</label>
-                            <label class="chk-label"><input type="checkbox" value="Cat Mulus / Sesuai Umur" class="chk-item"> Cat Mulus / Minimal Baret</label>
+                            <label class="chk-label"><input type="checkbox" value="Nat & Sealer Pintu Ori" class="chk-item"> Nat & Sealer Pintu Ori</label>
+                            <label class="chk-label"><input type="checkbox" value="Rangka Bebas Bekas Laka" class="chk-item"> Rangka Bebas Bekas Laka</label>
+                            <label class="chk-label"><input type="checkbox" value="Cat Mulus / Minimal Baret" class="chk-item"> Cat Mulus / Minimal Baret</label>
                         </div>
                     </div>
 
@@ -192,11 +192,11 @@
                         </h3>
                         <div class="grid grid-cols-2 md:grid-cols-3 gap-2 text-xs">
                             <label class="chk-label"><input type="checkbox" value="Tie Rod & Long Tie Rod Fit" class="chk-item"> Tie Rod & Long Tie Rod</label>
-                            <label class="chk-label"><input type="checkbox" value="Bushing Arm Bebas Pecah" class="chk-item"> Bushing Arm / Link Stabil</label>
-                            <label class="chk-label"><input type="checkbox" value="Shockbreaker Bebas Bocor/Bocor Oli" class="chk-item"> Shockbreaker Kering</label>
-                            <label class="chk-label"><input type="checkbox" value="Rack Steer Bebas Bunyi Speling" class="chk-item"> Rack Steer No Bunyi</label>
-                            <label class="chk-label"><input type="checkbox" value="Kampas Rem Tebal & Piringan Rata" class="chk-item"> Kampas Rem & Piringan Disc</label>
-                            <label class="chk-label"><input type="checkbox" value="Ban Tebal (>70%)" class="chk-item"> Kondisi Ban Tebal</label>
+                            <label class="chk-label"><input type="checkbox" value="Bushing Arm / Link Stabil OK" class="chk-item"> Bushing Arm / Link Stabil</label>
+                            <label class="chk-label"><input type="checkbox" value="Shockbreaker Kering/No Leak" class="chk-item"> Shockbreaker Kering</label>
+                            <label class="chk-label"><input type="checkbox" value="Rack Steer No Bunyi" class="chk-item"> Rack Steer No Bunyi</label>
+                            <label class="chk-label"><input type="checkbox" value="Kampas Rem & Piringan Disc OK" class="chk-item"> Kampas Rem & Piringan Disc</label>
+                            <label class="chk-label"><input type="checkbox" value="Kondisi Ban Tebal (>70%)" class="chk-item"> Kondisi Ban Tebal</label>
                         </div>
                     </div>
 
@@ -206,16 +206,16 @@
                             <i class="fa-solid fa-tv"></i> 7. Kabin Interior & Kelengkapan Audio
                         </h3>
                         <div class="grid grid-cols-2 md:grid-cols-3 gap-2 text-xs">
-                            <label class="chk-label"><input type="checkbox" value="Kulit Setir & Shift Knob Rapi" class="chk-item"> Kulit Setir & Knob Shift</label>
-                            <label class="chk-label"><input type="checkbox" value="Jok Original / Lapisan Busa Bagus" class="chk-item"> Jok Busa / Reclining OK</label>
+                            <label class="chk-label"><input type="checkbox" value="Kulit Setir & Knob Shift Bagus" class="chk-item"> Kulit Setir & Knob Shift</label>
+                            <label class="chk-label"><input type="checkbox" value="Jok Busa / Reclining OK" class="chk-item"> Jok Busa / Reclining OK</label>
                             <label class="chk-label"><input type="checkbox" value="Doortrim & Plafon Bersih" class="chk-item"> Doortrim & Plafon Bersih</label>
-                            <label class="chk-label"><input type="checkbox" value="Audio Headunit / TV Kiri Kanan Bekerja" class="chk-item"> Audio Headunit / TV OK</label>
-                            <label class="chk-label"><input type="checkbox" value="Power Window & Retract Mirror OK" class="chk-item"> Power Window / Spion Retract</label>
-                            <label class="chk-label"><input type="checkbox" value="Instrument Cluster No Error" class="chk-item"> Cluster Speedo No Error</label>
+                            <label class="chk-label"><input type="checkbox" value="Audio Headunit / TV OK" class="chk-item"> Audio Headunit / TV OK</label>
+                            <label class="chk-label"><input type="checkbox" value="Power Window / Spion Retract OK" class="chk-item"> Power Window / Spion Retract</label>
+                            <label class="chk-label"><input type="checkbox" value="Cluster Speedo No Error" class="chk-item"> Cluster Speedo No Error</label>
                         </div>
                     </div>
 
-                    <button onclick="saveUnitData()" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-3 rounded-xl transition-all shadow-lg flex items-center justify-center gap-2 text-sm">
+                    <button type="button" onclick="saveUnitData()" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-3 rounded-xl transition-all shadow-lg flex items-center justify-center gap-2 text-sm">
                         <i class="fa-solid fa-floppy-disk"></i> Simpan Laporan Inspeksi Unit Ke Database
                     </button>
                 </section>
@@ -263,7 +263,13 @@
 
     <!-- Application Script -->
     <script>
-        let database = JSON.parse(localStorage.getItem('showroom_inspector_db')) || [];
+        let database = [];
+        try {
+            database = JSON.parse(localStorage.getItem('showroom_inspector_db')) || [];
+        } catch (e) {
+            console.error("Gagal membaca LocalStorage:", e);
+            database = [];
+        }
 
         function calculateFinancials() {
             const buy = parseFloat(document.getElementById('buyPrice').value) || 0;
@@ -280,26 +286,31 @@
         }
 
         function saveUnitData() {
-            const carName = document.getElementById('carName').value;
+            const carNameInput = document.getElementById('carName');
+            const carName = carNameInput ? carNameInput.value.trim() : '';
             const carNopol = document.getElementById('carNopol').value;
             const carSpec = document.getElementById('carSpec').value;
             const fin = calculateFinancials();
 
-            if (!carName) {
-                alert('Nama / Tipe Mobil wajib diisi!');
+            // Validasi Input Wajib
+            if (carName === '') {
+                alert('⚠️ Kolom "Nama / Tipe Mobil" wajib diisi terlebih dahulu!');
+                carNameInput.focus();
                 return;
             }
 
+            // Mengambil semua checkbox yang dicentang
             const checkedPoints = [];
             document.querySelectorAll('.chk-item:checked').forEach(chk => {
                 checkedPoints.push(chk.value);
             });
 
+            // Objek Data Baru
             const newUnit = {
                 id: Date.now(),
-                carName,
-                carNopol,
-                carSpec,
+                carName: carName,
+                carNopol: carNopol,
+                carSpec: carSpec,
                 buyPrice: fin.buy,
                 repairCost: fin.repair,
                 sellPrice: fin.sell,
@@ -309,12 +320,18 @@
                 timestamp: new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' })
             };
 
+            // Simpan ke Array & LocalStorage
             database.push(newUnit);
-            localStorage.setItem('showroom_inspector_db', JSON.stringify(database));
+            try {
+                localStorage.setItem('showroom_inspector_db', JSON.stringify(database));
+                alert('✅ Data unit "' + carName + '" BERHASIL TERSIMPAN!');
+            } catch (e) {
+                alert('❌ Gagal menyimpan data ke memori browser.');
+                console.error(e);
+            }
             
             resetForm();
             renderDashboard();
-            alert('Data unit berhasil disimpan!');
         }
 
         function resetForm() {
@@ -338,6 +355,8 @@
 
         function renderDashboard() {
             const container = document.getElementById('unitListContainer');
+            if (!container) return;
+            
             container.innerHTML = '';
 
             let sumModal = 0;
@@ -390,10 +409,10 @@
 
                     <div>
                         <span class="text-[10px] text-emerald-400 font-bold uppercase tracking-wider block mb-1">
-                            Poin Lolos (${item.checklist.length}):
+                            Poin Lolos (${item.checklist ? item.checklist.length : 0}):
                         </span>
                         <div class="flex flex-wrap gap-1 max-h-24 overflow-y-auto pr-1">
-                            ${item.checklist.map(point => `<span class="bg-slate-800 text-slate-300 text-[10px] px-2 py-0.5 rounded border border-slate-700">${point}</span>`).join('') || '<span class="text-[10px] text-slate-500">Tidak ada item tercentang</span>'}
+                            ${item.checklist && item.checklist.length > 0 ? item.checklist.map(point => `<span class="bg-slate-800 text-slate-300 text-[10px] px-2 py-0.5 rounded border border-slate-700">${point}</span>`).join('') : '<span class="text-[10px] text-slate-500">Tidak ada item tercentang</span>'}
                         </div>
                     </div>
 
@@ -420,7 +439,9 @@
         }
 
         // Render otomatis saat halaman pertama kali dibuka
-        renderDashboard();
+        window.onload = function() {
+            renderDashboard();
+        };
     </script>
 </body>
 </html>
