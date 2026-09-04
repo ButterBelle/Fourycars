@@ -3,261 +3,424 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sistem Inspeksi & Keuangan Showroom (Pribadi)</title>
+    <title>Sistem Inspeksi & Keuangan Showroom</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- FontAwesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
-<body class="bg-slate-900 text-slate-100 font-sans min-h-screen p-4 md:p-8">
+<body class="bg-slate-900 text-slate-100 font-sans min-h-screen p-3 md:p-6">
 
-    <div class="max-w-6xl mx-auto space-y-6">
+    <div class="max-w-7xl mx-auto space-y-6">
         
-        <!-- Header & Summary Dashboard -->
-        <header class="flex flex-col md:flex-row justify-between items-start md:items-center bg-slate-800 p-6 rounded-xl border border-slate-700 shadow-lg gap-4">
-            <div>
-                <h1 class="text-2xl font-bold text-emerald-400"><i class="fa-solid fa-car-side mr-2"></i>Garage Inspector & Financial Tracker</h1>
-                <p class="text-slate-400 text-sm">Alat Pencatatan Inspeksi & Keuangan Jual-Beli Mobil</p>
-            </div>
-            <div class="flex gap-4 w-full md:w-auto">
-                <div class="bg-slate-900 p-3 rounded-lg border border-slate-700 text-center flex-1 md:w-36">
-                    <span class="text-xs text-slate-400 block">Total Modal</span>
-                    <span id="summaryModal" class="text-lg font-bold text-amber-400">Rp 0</span>
+        <!-- Dashboard Header & Keuangan -->
+        <header class="bg-slate-800 p-6 rounded-2xl border border-slate-700 shadow-xl space-y-4">
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b border-slate-700 pb-4">
+                <div>
+                    <h1 class="text-2xl md:text-3xl font-extrabold text-emerald-400 flex items-center gap-2">
+                        <i class="fa-solid fa-car-tunnel"></i> Inspector & Showroom Ledger
+                    </h1>
+                    <p class="text-slate-400 text-xs md:text-sm">Sistem Manajemen Inspeksi Kendaraan & Rekapitulasi Keuangan Proyek</p>
                 </div>
-                <div class="bg-slate-900 p-3 rounded-lg border border-slate-700 text-center flex-1 md:w-36">
-                    <span class="text-xs text-slate-400 block">Total Profit</span>
-                    <span id="summaryProfit" class="text-lg font-bold text-emerald-400">Rp 0</span>
+                <div class="flex gap-2">
+                    <button onclick="exportData()" class="bg-slate-700 hover:bg-slate-600 text-xs px-3 py-2 rounded-lg border border-slate-600 flex items-center gap-1">
+                        <i class="fa-solid fa-download"></i> Backup Data
+                    </button>
+                    <button onclick="resetForm()" class="bg-amber-600 hover:bg-amber-500 text-xs px-3 py-2 rounded-lg text-white flex items-center gap-1">
+                        <i class="fa-solid fa-rotate-left"></i> Reset Form
+                    </button>
+                </div>
+            </div>
+
+            <!-- Summary Financial Cards -->
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
+                <div class="bg-slate-900/80 p-4 rounded-xl border border-slate-700">
+                    <span class="text-xs text-slate-400 block mb-1">Total Unit Terdata</span>
+                    <span id="summaryTotalUnit" class="text-xl md:text-2xl font-black text-slate-100">0 Unit</span>
+                </div>
+                <div class="bg-slate-900/80 p-4 rounded-xl border border-slate-700">
+                    <span class="text-xs text-slate-400 block mb-1">Total Modal Digunakan</span>
+                    <span id="summaryModal" class="text-xl md:text-2xl font-black text-amber-400">Rp 0</span>
+                </div>
+                <div class="bg-slate-900/80 p-4 rounded-xl border border-slate-700">
+                    <span class="text-xs text-slate-400 block mb-1">Total Proyeksi Omset</span>
+                    <span id="summaryOmset" class="text-xl md:text-2xl font-black text-blue-400">Rp 0</span>
+                </div>
+                <div class="bg-slate-900/80 p-4 rounded-xl border border-slate-700">
+                    <span class="text-xs text-slate-400 block mb-1">Total Potensi Keuntungan</span>
+                    <span id="summaryProfit" class="text-xl md:text-2xl font-black text-emerald-400">Rp 0</span>
                 </div>
             </div>
         </header>
 
+        <!-- Main Layout Split -->
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
             
-            <!-- Left Column: Form Inspeksi & Input Keuangan -->
+            <!-- Form & Checklist (2 Cols) -->
             <div class="lg:col-span-2 space-y-6">
                 
-                <!-- Section 1: Informasi Unit & Modal -->
-                <section class="bg-slate-800 p-6 rounded-xl border border-slate-700 shadow-md space-y-4">
-                    <h2 class="text-xl font-semibold text-slate-200 border-b border-slate-700 pb-2 flex items-center gap-2">
-                        <i class="fa-solid fa-file-invoice-dollar text-emerald-400"></i> Detail Unit & Biaya
+                <!-- 1. Data Unit & Finansial -->
+                <section class="bg-slate-800 p-5 rounded-xl border border-slate-700 shadow-md space-y-4">
+                    <h2 class="text-lg font-bold text-slate-200 flex items-center gap-2 border-b border-slate-700 pb-2">
+                        <i class="fa-solid fa-coins text-emerald-400"></i> Data Kendaraan & Biaya Modal
                     </h2>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
                         <div>
-                            <label class="block text-xs text-slate-400 mb-1">Nama / Type Mobil</label>
-                            <input type="text" id="carName" placeholder="Contoh: Honda HR-V E CVT 2018" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-sm focus:outline-none focus:border-emerald-500">
+                            <label class="block text-xs text-slate-400 mb-1">Nama / Tipe Mobil</label>
+                            <input type="text" id="carName" placeholder="Pajero Sport Dakar / Innova Reborn" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-xs text-slate-100 focus:outline-none focus:border-emerald-500">
                         </div>
                         <div>
-                            <label class="block text-xs text-slate-400 mb-1">Nomor Polisi / Warna</label>
-                            <input type="text" id="carNopol" placeholder="B 1234 ABC / Hitam" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-sm focus:outline-none focus:border-emerald-500">
+                            <label class="block text-xs text-slate-400 mb-1">Nopol & Warna</label>
+                            <input type="text" id="carNopol" placeholder="BK 1234 XX / Hitam" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-xs text-slate-100 focus:outline-none focus:border-emerald-500">
                         </div>
                         <div>
-                            <label class="block text-xs text-slate-400 mb-1">Harga Beli / Open Price (Rp)</label>
-                            <input type="number" id="buyPrice" oninput="calculateTotal()" placeholder="0" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-sm focus:outline-none focus:border-emerald-500">
+                            <label class="block text-xs text-slate-400 mb-1">Tahun & Jenis Bahan Bakar</label>
+                            <input type="text" id="carSpec" placeholder="2019 / Diesel" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-xs text-slate-100 focus:outline-none focus:border-emerald-500">
                         </div>
                         <div>
-                            <label class="block text-xs text-slate-400 mb-1">Estimasi Biaya Perbaikan/PR (Rp)</label>
-                            <input type="number" id="repairCost" oninput="calculateTotal()" placeholder="0" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-sm focus:outline-none focus:border-emerald-500">
+                            <label class="block text-xs text-slate-400 mb-1">Harga Beli Beli / Open (Rp)</label>
+                            <input type="number" id="buyPrice" oninput="calculateFinancials()" placeholder="0" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-xs text-slate-100 focus:outline-none focus:border-emerald-500">
                         </div>
                         <div>
-                            <label class="block text-xs text-slate-400 mb-1">Target / Realisasi Harga Jual (Rp)</label>
-                            <input type="number" id="sellPrice" oninput="calculateTotal()" placeholder="0" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-sm focus:outline-none focus:border-emerald-500">
+                            <label class="block text-xs text-slate-400 mb-1">Estimasi Biaya PR / Restorasi (Rp)</label>
+                            <input type="number" id="repairCost" oninput="calculateFinancials()" placeholder="0" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-xs text-slate-100 focus:outline-none focus:border-emerald-500">
                         </div>
                         <div>
-                            <label class="block text-xs text-slate-400 mb-1">Proyeksi Keuntungan Bersih</label>
-                            <div id="projectedProfit" class="w-full bg-slate-950 border border-slate-800 rounded p-2 text-sm font-bold text-emerald-400">Rp 0</div>
+                            <label class="block text-xs text-slate-400 mb-1">Target Harga Jual (Rp)</label>
+                            <input type="number" id="sellPrice" oninput="calculateFinancials()" placeholder="0" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-xs text-slate-100 focus:outline-none focus:border-emerald-500">
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-2 gap-3 bg-slate-950 p-3 rounded-lg border border-slate-800 text-xs">
+                        <div>
+                            <span class="text-slate-400 block">Total Modal Unit Ini:</span>
+                            <span id="unitTotalModal" class="font-bold text-amber-400 text-sm">Rp 0</span>
+                        </div>
+                        <div>
+                            <span class="text-slate-400 block">Estimasi Keuntungan/Profit:</span>
+                            <span id="unitProfit" class="font-bold text-emerald-400 text-sm">Rp 0</span>
                         </div>
                     </div>
                 </section>
 
-                <!-- Section 2: Checklist Inspeksi Kendaraan -->
-                <section class="bg-slate-800 p-6 rounded-xl border border-slate-700 shadow-md space-y-4">
-                    <h2 class="text-xl font-semibold text-slate-200 border-b border-slate-700 pb-2 flex items-center gap-2">
-                        <i class="fa-solid fa-clipboard-check text-emerald-400"></i> Checklist Inspeksi Lapangan
+                <!-- 2. Form Inspeksi Mendalam -->
+                <section class="bg-slate-800 p-5 rounded-xl border border-slate-700 shadow-md space-y-6">
+                    <h2 class="text-lg font-bold text-slate-200 flex items-center gap-2 border-b border-slate-700 pb-2">
+                        <i class="fa-solid fa-list-check text-emerald-400"></i> Kertas Kerja Inspeksi Fisik
                     </h2>
 
-                    <!-- Dokumen -->
-                    <div>
-                        <h3 class="text-sm font-bold text-amber-400 mb-2">1. Legalitas & Dokumen</h3>
-                        <div class="grid grid-cols-2 md:grid-cols-3 gap-3 text-sm">
-                            <label class="flex items-center gap-2 bg-slate-900 p-2 rounded border border-slate-700 cursor-pointer">
-                                <input type="checkbox" class="chk-item accent-emerald-500" value="STNK Asli & Pajak On"> STNK & Pajak
-                            </label>
-                            <label class="flex items-center gap-2 bg-slate-900 p-2 rounded border border-slate-700 cursor-pointer">
-                                <input type="checkbox" class="chk-item accent-emerald-500" value="BPKB & Faktur Ada"> BPKB & Faktur
-                            </label>
-                            <label class="flex items-center gap-2 bg-slate-900 p-2 rounded border border-slate-700 cursor-pointer">
-                                <input type="checkbox" class="chk-item accent-emerald-500" value="No. Rangka/Mesin Akurat"> No. Rangka Akurat
-                            </label>
+                    <!-- Kategori 1: Surat-surat -->
+                    <div class="space-y-2">
+                        <h3 class="text-xs font-bold text-amber-400 uppercase tracking-wider flex items-center gap-1">
+                            <i class="fa-solid fa-folder-open"></i> 1. Keabsahan & Legalitas Surat
+                        </h3>
+                        <div class="grid grid-cols-2 md:grid-cols-3 gap-2 text-xs">
+                            <label class="chk-label"><input type="checkbox" value="STNK Asli & On" class="chk-item"> STNK Asli & Pajak On</label>
+                            <label class="chk-label"><input type="checkbox" value="BPKB & Faktur Lengkap" class="chk-item"> BPKB & Faktur Lengkap</label>
+                            <label class="chk-label"><input type="checkbox" value="Cek Fisik Samsat Akurat" class="chk-item"> Cek Fisik No. Rangka/Mesin</label>
+                            <label class="chk-label"><input type="checkbox" value="Bebas Blokir/Tilang Elektronik" class="chk-item"> Bebas Blokir / ETLE</label>
+                            <label class="chk-label"><input type="checkbox" value="Kunci Serep Ada" class="chk-item"> Kunci Serep Tersedia</label>
+                            <label class="chk-label"><input type="checkbox" value="Buku Servis & Manual Ada" class="chk-item"> Buku Servis/Manual</label>
                         </div>
                     </div>
 
-                    <!-- Fisik & Mesin -->
-                    <div>
-                        <h3 class="text-sm font-bold text-amber-400 mb-2">2. Kompartemen Mesin & Transmisi</h3>
-                        <div class="grid grid-cols-2 md:grid-cols-3 gap-3 text-sm">
-                            <label class="flex items-center gap-2 bg-slate-900 p-2 rounded border border-slate-700 cursor-pointer">
-                                <input type="checkbox" class="chk-item accent-emerald-500" value="Bebas Rembesan Oli"> Bebas Rembes Oli
-                            </label>
-                            <label class="flex items-center gap-2 bg-slate-900 p-2 rounded border border-slate-700 cursor-pointer">
-                                <input type="checkbox" class="chk-item accent-emerald-500" value="Suara Mesin Halus"> Suara Mesin Halus
-                            </label>
-                            <label class="flex items-center gap-2 bg-slate-900 p-2 rounded border border-slate-700 cursor-pointer">
-                                <input type="checkbox" class="chk-item accent-emerald-500" value="Transmisi Smooth"> Matik/Manual Smooth
-                            </label>
-                            <label class="flex items-center gap-2 bg-slate-900 p-2 rounded border border-slate-700 cursor-pointer">
-                                <input type="checkbox" class="chk-item accent-emerald-500" value="Bebas Indikator Engine Check"> No Check Engine
-                            </label>
+                    <!-- Kategori 2: Mesin & Diesel/Bensin -->
+                    <div class="space-y-2">
+                        <h3 class="text-xs font-bold text-amber-400 uppercase tracking-wider flex items-center gap-1">
+                            <i class="fa-solid fa-gears"></i> 2. Kompartemen Mesin, Oli & Dapur Pacu
+                        </h3>
+                        <div class="grid grid-cols-2 md:grid-cols-3 gap-2 text-xs">
+                            <label class="chk-label"><input type="checkbox" value="Oli Mesin Bersih/Bebas Sludge" class="chk-item"> Oli Mesin (No Sludge)</label>
+                            <label class="chk-label"><input type="checkbox" value="Suara Mesin Halus/Piston Normal" class="chk-item"> Suara Mesin Halus</label>
+                            <label class="chk-label"><input type="checkbox" value="Injektor Normal/Bebas Ngincang" class="chk-item"> Injektor / Pengapian OK</label>
+                            <label class="chk-label"><input type="checkbox" value="EGR / Intake Clean" class="chk-item"> EGR / Intake Sistem OK</label>
+                            <label class="chk-label"><input type="checkbox" value="Bebas Asap Ngebul / Asap Hitam Pekat" class="chk-item"> Bebas Asap Ngebul/Hitam</label>
+                            <label class="chk-label"><input type="checkbox" value="Radiator & Coolant Bebas Bocor" class="chk-item"> Radiator & Coolant OK</label>
+                            <label class="chk-label"><input type="checkbox" value="Alternator & Pengisian Aki Good" class="chk-item"> Alternator & Pengisian Aki</label>
+                            <label class="chk-label"><input type="checkbox" value="Turbocharger Bekerja Normal" class="chk-item"> Turbocharger (Jika Ada)</label>
+                            <label class="chk-label"><input type="checkbox" value="Bebas Rembesan Oli Head/Carter" class="chk-item"> Bebas Rembes Oli Carter/Head</label>
                         </div>
                     </div>
 
-                    <!-- Bodi & Rangka (Bebas Laka/Banjir) -->
-                    <div>
-                        <h3 class="text-sm font-bold text-amber-400 mb-2">3. Struktur Bodi & Track Record</h3>
-                        <div class="grid grid-cols-2 md:grid-cols-3 gap-3 text-sm">
-                            <label class="flex items-center gap-2 bg-slate-900 p-2 rounded border border-slate-700 cursor-pointer">
-                                <input type="checkbox" class="chk-item accent-emerald-500" value="Bebas Nabrak Lengkungan Apron"> Bebas Tabrak/Apron
-                            </label>
-                            <label class="flex items-center gap-2 bg-slate-900 p-2 rounded border border-slate-700 cursor-pointer">
-                                <input type="checkbox" class="chk-item accent-emerald-500" value="Bebas Karat/Banjir (Bawah Karpet)"> Bebas Banjir
-                            </label>
-                            <label class="flex items-center gap-2 bg-slate-900 p-2 rounded border border-slate-700 cursor-pointer">
-                                <input type="checkbox" class="chk-item accent-emerald-500" value="Cat Ori/Kaleng"> Cat Mulus/Kaleng
-                            </label>
+                    <!-- Kategori 3: Transmisi & Matik -->
+                    <div class="space-y-2">
+                        <h3 class="text-xs font-bold text-amber-400 uppercase tracking-wider flex items-center gap-1">
+                            <i class="fa-solid fa-code-branch"></i> 3. Transmisi & Drivetrain
+                        </h3>
+                        <div class="grid grid-cols-2 md:grid-cols-3 gap-2 text-xs">
+                            <label class="chk-label"><input type="checkbox" value="Matik Bebas Jedug / Delay P-R-D" class="chk-item"> Matik Bebas Jedug/Delay</label>
+                            <label class="chk-label"><input type="checkbox" value="Perpindahan Gigi Smooth" class="chk-item"> Transmisi Smooth</label>
+                            <label class="chk-label"><input type="checkbox" value="Oli Transmisi Bening/Merah" class="chk-item"> Kondisi Oli Transmisi OK</label>
+                            <label class="chk-label"><input type="checkbox" value="Kopling Manual Tidak Selip" class="chk-item"> Kopling / Deksel (Manual)</label>
+                            <label class="chk-label"><input type="checkbox" value="Gardan Bebas Dengung" class="chk-item"> Gardan / As Roda OK</label>
                         </div>
                     </div>
 
-                    <button onclick="saveRecord()" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-3 rounded-lg transition-all flex items-center justify-center gap-2">
-                        <i class="fa-solid fa-floppy-disk"></i> Simpan Catatan Unit Ini
+                    <!-- Kategori 4: Sistem AC -->
+                    <div class="space-y-2">
+                        <h3 class="text-xs font-bold text-amber-400 uppercase tracking-wider flex items-center gap-1">
+                            <i class="fa-solid fa-snowflake"></i> 4. Sistem Pendingin AC
+                        </h3>
+                        <div class="grid grid-cols-2 md:grid-cols-3 gap-2 text-xs">
+                            <label class="chk-label"><input type="checkbox" value="Kompresor AC Halus" class="chk-item"> Kompresor AC Halus</label>
+                            <label class="chk-label"><input type="checkbox" value="Magnetic Clutch Ceklek Normal" class="chk-item"> Magnetic Clutch Bekerja</label>
+                            <label class="chk-label"><input type="checkbox" value="Kondensor AC Mulus" class="chk-item"> Kondensor AC Bagus</label>
+                            <label class="chk-label"><input type="checkbox" value="Evaporator Dingin / Bebas Bocor" class="chk-item"> Evaporator Dingin</label>
+                            <label class="chk-label"><input type="checkbox" value="Blower & Hembusan AC Menggigit" class="chk-item"> Blower & Hembusan Kuat</label>
+                            <label class="chk-label"><input type="checkbox" value="Bebas Bau Apek / Lembab" class="chk-item"> Kabin Bebas Bau Apek</label>
+                        </div>
+                    </div>
+
+                    <!-- Kategori 5: Bodi & Rangka -->
+                    <div class="space-y-2">
+                        <h3 class="text-xs font-bold text-amber-400 uppercase tracking-wider flex items-center gap-1">
+                            <i class="fa-solid fa-shield-halved"></i> 5. Struktur Rangka & Kondisi Bodi
+                        </h3>
+                        <div class="grid grid-cols-2 md:grid-cols-3 gap-2 text-xs">
+                            <label class="chk-label"><input type="checkbox" value="Apron Depan Utuh (No Tabrak)" class="chk-item"> Apron Depan Utuh/Original</label>
+                            <label class="chk-label"><input type="checkbox" value="Bullhead & Tiang Radiator Utuh" class="chk-item"> Bullhead & Tiang Radiator</label>
+                            <label class="chk-label"><input type="checkbox" value="Chassis / Floor Pan Bebas Banjir" class="chk-item"> Bebas Karat / Banjir</label>
+                            <label class="chk-label"><input type="checkbox" value="Nat & Sealer Pintu Original" class="chk-item"> Nat & Sealer Pintu Ori</label>
+                            <label class="chk-label"><input type="checkbox" value="Bebas Bekas Potongan Rangka" class="chk-item"> Rangka Bebas Bekas Laka</label>
+                            <label class="chk-label"><input type="checkbox" value="Cat Mulus / Sesuai Umur" class="chk-item"> Cat Mulus / Minimal Baret</label>
+                        </div>
+                    </div>
+
+                    <!-- Kategori 6: Kaki-kaki & Pengereman -->
+                    <div class="space-y-2">
+                        <h3 class="text-xs font-bold text-amber-400 uppercase tracking-wider flex items-center gap-1">
+                            <i class="fa-solid fa-compact-disc"></i> 6. Kaki-Kaki, Suspension & Rem
+                        </h3>
+                        <div class="grid grid-cols-2 md:grid-cols-3 gap-2 text-xs">
+                            <label class="chk-label"><input type="checkbox" value="Tie Rod & Long Tie Rod Fit" class="chk-item"> Tie Rod & Long Tie Rod</label>
+                            <label class="chk-label"><input type="checkbox" value="Bushing Arm Bebas Pecah" class="chk-item"> Bushing Arm / Link Stabil</label>
+                            <label class="chk-label"><input type="checkbox" value="Shockbreaker Bebas Bocor/Bocor Oli" class="chk-item"> Shockbreaker Kering</label>
+                            <label class="chk-label"><input type="checkbox" value="Rack Steer Bebas Bunyi Speling" class="chk-item"> Rack Steer No Bunyi</label>
+                            <label class="chk-label"><input type="checkbox" value="Kampas Rem Tebal & Piringan Rata" class="chk-item"> Kampas Rem & Piringan Disc</label>
+                            <label class="chk-label"><input type="checkbox" value="Ban Tebal (>70%)" class="chk-item"> Kondisi Ban Tebal</label>
+                        </div>
+                    </div>
+
+                    <!-- Kategori 7: Interior & Elekronik -->
+                    <div class="space-y-2">
+                        <h3 class="text-xs font-bold text-amber-400 uppercase tracking-wider flex items-center gap-1">
+                            <i class="fa-solid fa-tv"></i> 7. Kabin Interior & Kelengkapan Audio
+                        </h3>
+                        <div class="grid grid-cols-2 md:grid-cols-3 gap-2 text-xs">
+                            <label class="chk-label"><input type="checkbox" value="Kulit Setir & Shift Knob Rapi" class="chk-item"> Kulit Setir & Knob Shift</label>
+                            <label class="chk-label"><input type="checkbox" value="Jok Original / Lapisan Busa Bagus" class="chk-item"> Jok Busa / Reclining OK</label>
+                            <label class="chk-label"><input type="checkbox" value="Doortrim & Plafon Bersih" class="chk-item"> Doortrim & Plafon Bersih</label>
+                            <label class="chk-label"><input type="checkbox" value="Audio Headunit / TV Kiri Kanan Bekerja" class="chk-item"> Audio Headunit / TV OK</label>
+                            <label class="chk-label"><input type="checkbox" value="Power Window & Retract Mirror OK" class="chk-item"> Power Window / Spion Retract</label>
+                            <label class="chk-label"><input type="checkbox" value="Instrument Cluster No Error" class="chk-item"> Cluster Speedo No Error</label>
+                        </div>
+                    </div>
+
+                    <button onclick="saveUnitData()" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-3 rounded-xl transition-all shadow-lg flex items-center justify-center gap-2 text-sm">
+                        <i class="fa-solid fa-floppy-disk"></i> Simpan Laporan Inspeksi Unit Ke Database
                     </button>
                 </section>
 
             </div>
 
-            <!-- Right Column: List History Unit yang Dicatat -->
-            <div class="bg-slate-800 p-6 rounded-xl border border-slate-700 shadow-md space-y-4">
-                <h2 class="text-xl font-semibold text-slate-200 border-b border-slate-700 pb-2 flex items-center gap-2">
-                    <i class="fa-solid fa-list-check text-emerald-400"></i> Daftar Unit Tersimpan
-                </h2>
-                <div id="unitList" class="space-y-3 max-h-[600px] overflow-y-auto pr-1">
-                    <!-- Data tersimpan akan dirender di sini via JS -->
+            <!-- Dashboard/Daftar Unit Tersimpan (1 Col) -->
+            <div class="space-y-4">
+                <div class="bg-slate-800 p-5 rounded-xl border border-slate-700 shadow-md">
+                    <h2 class="text-base font-bold text-slate-200 border-b border-slate-700 pb-2 mb-4 flex items-center justify-between">
+                        <span><i class="fa-solid fa-boxes-stacked text-emerald-400"></i> Stok & Rekapitulasi Unit</span>
+                        <span id="unitBadgeCount" class="bg-emerald-500/20 text-emerald-400 text-xs px-2 py-0.5 rounded-full border border-emerald-500/30">0</span>
+                    </h2>
+                    
+                    <div id="unitListContainer" class="space-y-3 max-h-[850px] overflow-y-auto pr-1">
+                        <!-- Card unit tersimpan dirender melalui JavaScript -->
+                    </div>
                 </div>
             </div>
 
         </div>
     </div>
 
+    <style>
+        .chk-label {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            background-color: #0f172a;
+            padding: 0.6rem;
+            border-radius: 0.5rem;
+            border: 1px solid #334155;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .chk-label:hover {
+            border-color: #10b981;
+        }
+        .chk-item {
+            accent-color: #10b981;
+            width: 14px;
+            height: 14px;
+        }
+    </style>
+
     <!-- Application Script -->
     <script>
-        let db = JSON.parse(localStorage.getItem('garage_db')) || [];
+        let database = JSON.parse(localStorage.getItem('showroom_inspector_db')) || [];
 
-        function calculateTotal() {
+        function calculateFinancials() {
             const buy = parseFloat(document.getElementById('buyPrice').value) || 0;
             const repair = parseFloat(document.getElementById('repairCost').value) || 0;
             const sell = parseFloat(document.getElementById('sellPrice').value) || 0;
             
-            const totalCost = buy + repair;
-            const profit = sell - totalCost;
+            const totalModal = buy + repair;
+            const profit = sell - totalModal;
 
-            document.getElementById('projectedProfit').innerText = 'Rp ' + profit.toLocaleString('id-ID');
-            return { totalCost, profit };
+            document.getElementById('unitTotalModal').innerText = 'Rp ' + totalModal.toLocaleString('id-ID');
+            document.getElementById('unitProfit').innerText = 'Rp ' + profit.toLocaleString('id-ID');
+
+            return { totalModal, profit, buy, repair, sell };
         }
 
-        function saveRecord() {
-            const name = document.getElementById('carName').value;
-            const nopol = document.getElementById('carNopol').value;
-            const buy = parseFloat(document.getElementById('buyPrice').value) || 0;
-            const repair = parseFloat(document.getElementById('repairCost').value) || 0;
-            const sell = parseFloat(document.getElementById('sellPrice').value) || 0;
-            const { totalCost, profit } = calculateTotal();
+        function saveUnitData() {
+            const carName = document.getElementById('carName').value;
+            const carNopol = document.getElementById('carNopol').value;
+            const carSpec = document.getElementById('carSpec').value;
+            const fin = calculateFinancials();
 
-            if (!name) {
-                alert('Silakan isi Nama Mobil terlebih dahulu!');
+            if (!carName) {
+                alert('Nama / Tipe Mobil wajib diisi!');
                 return;
             }
 
-            const checkedList = [];
+            const checkedPoints = [];
             document.querySelectorAll('.chk-item:checked').forEach(chk => {
-                checkedList.push(chk.value);
+                checkedPoints.push(chk.value);
             });
 
             const newUnit = {
                 id: Date.now(),
-                name,
-                nopol,
-                buy,
-                repair,
-                sell,
-                totalCost,
-                profit,
-                checklist: checkedList,
-                date: new Date().toLocaleDateString('id-ID')
+                carName,
+                carNopol,
+                carSpec,
+                buyPrice: fin.buy,
+                repairCost: fin.repair,
+                sellPrice: fin.sell,
+                totalModal: fin.totalModal,
+                profit: fin.profit,
+                checklist: checkedPoints,
+                timestamp: new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' })
             };
 
-            db.push(newUnit);
-            localStorage.setItem('garage_db', JSON.stringify(db));
+            database.push(newUnit);
+            localStorage.setItem('showroom_inspector_db', JSON.stringify(database));
+            
             resetForm();
-            renderData();
+            renderDashboard();
+            alert('Data unit berhasil disimpan!');
         }
 
         function resetForm() {
             document.getElementById('carName').value = '';
             document.getElementById('carNopol').value = '';
+            document.getElementById('carSpec').value = '';
             document.getElementById('buyPrice').value = '';
             document.getElementById('repairCost').value = '';
             document.getElementById('sellPrice').value = '';
             document.querySelectorAll('.chk-item').forEach(chk => chk.checked = false);
-            calculateTotal();
+            calculateFinancials();
         }
 
-        function deleteRecord(id) {
-            db = db.filter(item => item.id !== id);
-            localStorage.setItem('garage_db', JSON.stringify(db));
-            renderData();
+        function deleteUnit(id) {
+            if (confirm('Apakah Anda yakin ingin menghapus data unit ini?')) {
+                database = database.filter(item => item.id !== id);
+                localStorage.setItem('showroom_inspector_db', JSON.stringify(database));
+                renderDashboard();
+            }
         }
 
-        function renderData() {
-            const listContainer = document.getElementById('unitList');
-            listContainer.innerHTML = '';
+        function renderDashboard() {
+            const container = document.getElementById('unitListContainer');
+            container.innerHTML = '';
 
-            let totalModalSum = 0;
-            let totalProfitSum = 0;
+            let sumModal = 0;
+            let sumOmset = 0;
+            let sumProfit = 0;
 
-            if (db.length === 0) {
-                listContainer.innerHTML = '<p class="text-slate-500 text-sm text-center py-4">Belum ada unit tersimpan.</p>';
+            document.getElementById('unitBadgeCount').innerText = database.length + ' Unit';
+
+            if (database.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center py-8 text-slate-500 space-y-2">
+                        <i class="fa-solid fa-folder-open text-3xl"></i>
+                        <p class="text-xs">Belum ada unit tersimpan.</p>
+                    </div>`;
             }
 
-            db.forEach(item => {
-                totalModalSum += item.totalCost;
-                totalProfitSum += item.profit;
+            database.forEach(item => {
+                sumModal += item.totalModal;
+                sumOmset += item.sellPrice;
+                sumProfit += item.profit;
 
                 const card = document.createElement('div');
-                card.className = 'bg-slate-900 border border-slate-700 p-4 rounded-lg space-y-2';
+                card.className = 'bg-slate-900 border border-slate-700 p-4 rounded-xl space-y-3 shadow-sm';
+                
                 card.innerHTML = `
-                    <div class="flex justify-between items-start">
+                    <div class="flex justify-between items-start border-b border-slate-800 pb-2">
                         <div>
-                            <h4 class="font-bold text-slate-100 text-sm">${item.name}</h4>
-                            <span class="text-xs text-slate-400">${item.nopol} (${item.date})</span>
+                            <h4 class="font-bold text-slate-100 text-sm">${item.carName}</h4>
+                            <span class="text-[11px] text-slate-400 block">${item.carNopol || 'Tanpa Nopol'} • ${item.carSpec || '-'}</span>
                         </div>
-                        <button onclick="deleteRecord(${item.id})" class="text-rose-400 hover:text-rose-300 text-xs"><i class="fa-solid fa-trash"></i></button>
+                        <button onclick="deleteUnit(${item.id})" class="text-rose-400 hover:text-rose-300 text-xs p-1">
+                            <i class="fa-solid fa-trash-can"></i>
+                        </button>
                     </div>
-                    <div class="text-xs space-y-1 bg-slate-950 p-2 rounded border border-slate-800">
-                        <div class="flex justify-between"><span>Modal (Beli+PR):</span><span class="text-amber-400 font-semibold">Rp ${item.totalCost.toLocaleString('id-ID')}</span></div>
-                        <div class="flex justify-between"><span>Jual:</span><span>Rp ${item.sell.toLocaleString('id-ID')}</span></div>
-                        <div class="flex justify-between border-t border-slate-800 pt-1"><span>Margin Profit:</span><span class="text-emerald-400 font-bold">Rp ${item.profit.toLocaleString('id-ID')}</span></div>
+
+                    <div class="grid grid-cols-2 gap-2 text-xs bg-slate-950 p-2.5 rounded-lg border border-slate-800/80">
+                        <div>
+                            <span class="text-slate-500 block text-[10px]">Total Modal</span>
+                            <span class="font-bold text-amber-400">Rp ${item.totalModal.toLocaleString('id-ID')}</span>
+                        </div>
+                        <div>
+                            <span class="text-slate-500 block text-[10px]">Target Jual</span>
+                            <span class="font-bold text-blue-400">Rp ${item.sellPrice.toLocaleString('id-ID')}</span>
+                        </div>
+                        <div class="col-span-2 border-t border-slate-800 pt-1 flex justify-between items-center">
+                            <span class="text-slate-400 text-[10px]">Proyeksi Profit:</span>
+                            <span class="font-bold text-emerald-400">Rp ${item.profit.toLocaleString('id-ID')}</span>
+                        </div>
                     </div>
-                    <div class="text-[11px] text-slate-400">
-                        <span class="text-emerald-400 font-semibold">Checklist Lolos (${item.checklist.length}):</span> ${item.checklist.join(', ') || 'Tidak ada'}
+
+                    <div>
+                        <span class="text-[10px] text-emerald-400 font-bold uppercase tracking-wider block mb-1">
+                            Poin Lolos (${item.checklist.length}):
+                        </span>
+                        <div class="flex flex-wrap gap-1 max-h-24 overflow-y-auto pr-1">
+                            ${item.checklist.map(point => `<span class="bg-slate-800 text-slate-300 text-[10px] px-2 py-0.5 rounded border border-slate-700">${point}</span>`).join('') || '<span class="text-[10px] text-slate-500">Tidak ada item tercentang</span>'}
+                        </div>
                     </div>
+
+                    <div class="text-[10px] text-slate-500 text-right">Tercatat: ${item.timestamp}</div>
                 `;
-                listContainer.appendChild(card);
+
+                container.appendChild(card);
             });
 
-            document.getElementById('summaryModal').innerText = 'Rp ' + totalModalSum.toLocaleString('id-ID');
-            document.getElementById('summaryProfit').innerText = 'Rp ' + totalProfitSum.toLocaleString('id-ID');
+            document.getElementById('summaryTotalUnit').innerText = database.length + ' Unit';
+            document.getElementById('summaryModal').innerText = 'Rp ' + sumModal.toLocaleString('id-ID');
+            document.getElementById('summaryOmset').innerText = 'Rp ' + sumOmset.toLocaleString('id-ID');
+            document.getElementById('summaryProfit').innerText = 'Rp ' + sumProfit.toLocaleString('id-ID');
         }
 
-        // Initial Load
-        renderData();
+        function exportData() {
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(database, null, 2));
+            const downloadAnchor = document.createElement('a');
+            downloadAnchor.setAttribute("href", dataStr);
+            downloadAnchor.setAttribute("download", `backup_showroom_${Date.now()}.json`);
+            document.body.appendChild(downloadAnchor);
+            downloadAnchor.click();
+            downloadAnchor.remove();
+        }
+
+        // Render otomatis saat halaman pertama kali dibuka
+        renderDashboard();
     </script>
 </body>
 </html>
