@@ -30,7 +30,7 @@
                     <h1 class="text-2xl md:text-3xl font-extrabold text-emerald-400 flex items-center gap-2">
                         <i class="fa-solid fa-cloud"></i> Fourycars by. Muhammad Yuda M.
                     </h1>
-                    <p class="text-slate-400 text-xs md:text-sm">Database Inspeksi Kendaraan, Keuangan & GPS Location (Firebase Cloud)</p>
+                    <p class="text-slate-400 text-xs md:text-sm">Database Inspeksi Kendaraan, Keuangan, Status Unit & Live Cloud Market Price</p>
                 </div>
                 <div class="flex gap-2">
                     <button onclick="exportToCSV()" class="bg-emerald-700 hover:bg-emerald-600 text-xs px-3 py-2 rounded-lg border border-emerald-600 text-white flex items-center gap-1 font-semibold">
@@ -45,7 +45,7 @@
             <!-- Summary Financial Cards -->
             <div class="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
                 <div class="bg-slate-900/80 p-4 rounded-xl border border-slate-700">
-                    <span class="text-xs text-slate-400 block mb-1">Total Unit Terdata</span>
+                    <span class="text-xs text-slate-400 block mb-1">Total Stok Aktif</span>
                     <span id="summaryTotalUnit" class="text-xl md:text-2xl font-black text-slate-100">0 Unit</span>
                 </div>
                 <div class="bg-slate-900/80 p-4 rounded-xl border border-slate-700">
@@ -63,15 +63,20 @@
             </div>
         </header>
 
-        <!-- Modul Riset Marketplace & Tabel Referensi Harga Pasaran (2005 - 2026) -->
+        <!-- Database Referensi Harga Pasaran (Dynamic Cloud Updates) -->
         <section class="bg-slate-800 p-5 rounded-xl border border-slate-700 shadow-md space-y-4">
             <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-3 border-b border-slate-700 pb-3">
-                <h2 class="text-base font-bold text-slate-200 flex items-center gap-2">
-                    <i class="fa-solid fa-table-list text-emerald-400"></i> Database Referensi Pasaran Bekas (2005 - 2026) & Riset Live
-                </h2>
-                <!-- Quick Search Input Marketplace -->
+                <div>
+                    <h2 class="text-base font-bold text-slate-200 flex items-center gap-2">
+                        <i class="fa-solid fa-table-list text-emerald-400"></i> Referensi Pasaran Umum Cloud (Ter-update Otomatis)
+                    </h2>
+                    <p class="text-slate-400 text-xs">Harga di bawah tersinkron langsung dari database Cloud Firebase (Dapat diperbarui tanpa ubah kodingan)</p>
+                </div>
                 <div class="flex gap-2 w-full md:w-auto">
-                    <input type="text" id="marketQuery" placeholder="Cek live ke marketplace (misal: Innova 2018)..." class="bg-slate-900 border border-slate-700 rounded-lg p-2 text-xs text-slate-100 focus:outline-none focus:border-emerald-500 w-full md:w-64">
+                    <button type="button" onclick="toggleAddPriceModal()" class="bg-emerald-600 hover:bg-emerald-500 text-white text-xs px-3 py-2 rounded-lg font-semibold flex items-center gap-1 whitespace-nowrap">
+                        <i class="fa-solid fa-plus-circle"></i> + Tambah/Update Pasaran
+                    </button>
+                    <input type="text" id="marketQuery" placeholder="Cek live ke marketplace..." class="bg-slate-900 border border-slate-700 rounded-lg p-2 text-xs text-slate-100 focus:outline-none focus:border-emerald-500 hidden md:block w-48">
                     <button type="button" onclick="searchMarketplace('fb')" class="bg-blue-600 hover:bg-blue-500 text-white text-xs px-3 py-2 rounded-lg font-semibold flex items-center gap-1 whitespace-nowrap">
                         <i class="fa-brands fa-facebook"></i> FB
                     </button>
@@ -81,77 +86,43 @@
                 </div>
             </div>
 
-            <!-- Search Bar khusus untuk Tabel Referensi -->
-            <div class="relative">
-                <i class="fa-solid fa-magnifying-glass absolute left-3 top-3 text-xs text-slate-500"></i>
-                <input type="text" id="searchTableInput" onkeyup="filterMarketTable()" placeholder="Ketik Merk, Tipe, atau Tahun (misal: Avanza, Honda 2015, Pajero 2020)..." class="w-full bg-slate-900 border border-slate-700 rounded-lg pl-8 pr-3 py-2 text-xs text-slate-100 focus:outline-none focus:border-emerald-500">
+            <!-- Form Pop-up Modal Tambah/Update Harga Pasaran -->
+            <div id="priceModal" class="hidden bg-slate-950 p-4 rounded-xl border border-slate-700 space-y-3">
+                <h3 class="text-xs font-bold text-emerald-400 uppercase tracking-wider"><i class="fa-solid fa-pen-to-square"></i> Update / Input Harga Pasaran Terbaru</h3>
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-2 text-xs">
+                    <input type="text" id="mBrand" placeholder="Merk (Misal: Toyota)" class="bg-slate-900 border border-slate-700 rounded p-2 text-slate-100">
+                    <input type="text" id="mType" placeholder="Tipe (Misal: Avanza 1.3 G)" class="bg-slate-900 border border-slate-700 rounded p-2 text-slate-100">
+                    <input type="text" id="mYear" placeholder="Tahun (Misal: 2005)" class="bg-slate-900 border border-slate-700 rounded p-2 text-slate-100">
+                    <input type="text" id="mPrice" placeholder="Pasaran (Misal: Rp 65jt - 73jt)" class="bg-slate-900 border border-slate-700 rounded p-2 text-slate-100">
+                </div>
+                <textarea id="mDesc" rows="2" placeholder="Deskripsi/Kondisi khas pasaran iklan saat ini..." class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-xs text-slate-100"></textarea>
+                <div class="flex justify-end gap-2">
+                    <button type="button" onclick="toggleAddPriceModal()" class="bg-slate-700 text-xs px-3 py-1.5 rounded">Batal</button>
+                    <button type="button" onclick="saveMarketPriceCloud()" class="bg-emerald-600 text-xs font-bold px-4 py-1.5 rounded text-white">Simpan Pasaran Baru</button>
+                </div>
             </div>
 
-            <!-- Tabel Referensi Pasaran dengan Scrollbar -->
-            <div class="overflow-x-auto max-h-[350px] overflow-y-auto rounded-lg border border-slate-700 bg-slate-950">
-                <table class="w-full text-xs text-left text-slate-300">
-                    <thead class="text-[11px] text-slate-400 uppercase bg-slate-900 sticky top-0 border-b border-slate-700">
+            <!-- Search Input untuk Tabel Pasaran -->
+            <div class="relative">
+                <i class="fa-solid fa-magnifying-glass absolute left-3 top-3 text-xs text-slate-500"></i>
+                <input type="text" id="searchMarketTableInput" onkeyup="filterMarketplaceTable()" placeholder="Ketik Merk, Tipe, Tahun, atau Kata Kunci Deskripsi (misal: Honda 2006, Pajero 2018)..." class="w-full bg-slate-900 border border-slate-700 rounded-lg pl-8 pr-3 py-2 text-xs text-slate-100 focus:outline-none focus:border-emerald-500">
+            </div>
+
+            <!-- Scrollable Table Area -->
+            <div class="overflow-x-auto max-h-[420px] overflow-y-auto rounded-lg border border-slate-700 bg-slate-950">
+                <table class="w-full text-xs text-left text-slate-300 min-w-[750px]">
+                    <thead class="text-[11px] text-slate-400 uppercase bg-slate-900 sticky top-0 border-b border-slate-700 z-10">
                         <tr>
-                            <th scope="col" class="px-4 py-2.5">Merk & Merek</th>
-                            <th scope="col" class="px-4 py-2.5">Tipe / Varian Utama</th>
-                            <th scope="col" class="px-4 py-2.5">Tahun Kisaran</th>
-                            <th scope="col" class="px-4 py-2.5">Estimasi Pasaran Bekas</th>
-                            <th scope="col" class="px-4 py-2.5 text-center">Aksi Cepat</th>
+                            <th scope="col" class="px-3 py-2.5">Merk</th>
+                            <th scope="col" class="px-3 py-2.5">Tipe & Varian Unit</th>
+                            <th scope="col" class="px-3 py-2.5">Tahun</th>
+                            <th scope="col" class="px-3 py-2.5">Harga Pasaran</th>
+                            <th scope="col" class="px-4 py-2.5">Deskripsi & Kondisi Iklan Ref</th>
+                            <th scope="col" class="px-3 py-2.5 text-center">Aksi Cepat</th>
                         </tr>
                     </thead>
-                    <tbody id="marketTableBody" class="divide-y divide-slate-800/60">
-                        <!-- Toyota -->
-                        <tr><td class="px-4 py-2 font-bold text-emerald-400">Toyota</td><td class="px-4 py-2">Avanza 1.3 E / G (Gen 1)</td><td class="px-4 py-2">2005 - 2011</td><td class="px-4 py-2 font-semibold text-amber-400">Rp 55.000.000 - Rp 105.000.000</td><td class="px-4 py-2 text-center"><button onclick="quickSearch('Toyota Avanza Gen 1')" class="text-blue-400 hover:underline">Riset</button></td></tr>
-                        <tr><td class="px-4 py-2 font-bold text-emerald-400">Toyota</td><td class="px-4 py-2">Grand New Avanza / Veloz</td><td class="px-4 py-2">2012 - 2021</td><td class="px-4 py-2 font-semibold text-amber-400">Rp 110.000.000 - Rp 185.000.000</td><td class="px-4 py-2 text-center"><button onclick="quickSearch('Grand New Avanza Veloz')" class="text-blue-400 hover:underline">Riset</button></td></tr>
-                        <tr><td class="px-4 py-2 font-bold text-emerald-400">Toyota</td><td class="px-4 py-2">All New Avanza / Veloz Q TSS</td><td class="px-4 py-2">2022 - 2026</td><td class="px-4 py-2 font-semibold text-amber-400">Rp 205.000.000 - Rp 275.000.000</td><td class="px-4 py-2 text-center"><button onclick="quickSearch('All New Avanza Veloz 2022')" class="text-blue-400 hover:underline">Riset</button></td></tr>
-                        <tr><td class="px-4 py-2 font-bold text-emerald-400">Toyota</td><td class="px-4 py-2">Kijang Innova Bensin/Diesel (Gen 1)</td><td class="px-4 py-2">2005 - 2015</td><td class="px-4 py-2 font-semibold text-amber-400">Rp 85.000.000 - Rp 210.000.000</td><td class="px-4 py-2 text-center"><button onclick="quickSearch('Innova Bensin Diesel Gen 1')" class="text-blue-400 hover:underline">Riset</button></td></tr>
-                        <tr><td class="px-4 py-2 font-bold text-emerald-400">Toyota</td><td class="px-4 py-2">Innova Reborn 2.0 / 2.4 Diesel</td><td class="px-4 py-2">2016 - 2022</td><td class="px-4 py-2 font-semibold text-amber-400">Rp 230.000.000 - Rp 385.000.000</td><td class="px-4 py-2 text-center"><button onclick="quickSearch('Innova Reborn Diesel')" class="text-blue-400 hover:underline">Riset</button></td></tr>
-                        <tr><td class="px-4 py-2 font-bold text-emerald-400">Toyota</td><td class="px-4 py-2">Innova Zenix G / V / Q Hybrid</td><td class="px-4 py-2">2023 - 2026</td><td class="px-4 py-2 font-semibold text-amber-400">Rp 370.000.000 - Rp 580.000.000</td><td class="px-4 py-2 text-center"><button onclick="quickSearch('Innova Zenix Hybrid')" class="text-blue-400 hover:underline">Riset</button></td></tr>
-                        <tr><td class="px-4 py-2 font-bold text-emerald-400">Toyota</td><td class="px-4 py-2">Fortuner 2.7 / 2.5 D-4D</td><td class="px-4 py-2">2005 - 2015</td><td class="px-4 py-2 font-semibold text-amber-400">Rp 115.000.000 - Rp 240.000.000</td><td class="px-4 py-2 text-center"><button onclick="quickSearch('Fortuner D4D 2005')" class="text-blue-400 hover:underline">Riset</button></td></tr>
-                        <tr><td class="px-4 py-2 font-bold text-emerald-400">Toyota</td><td class="px-4 py-2">Fortuner VRZ / TRD / GR Sport</td><td class="px-4 py-2">2016 - 2026</td><td class="px-4 py-2 font-semibold text-amber-400">Rp 360.000.000 - Rp 610.000.000</td><td class="px-4 py-2 text-center"><button onclick="quickSearch('Fortuner VRZ GR Sport')" class="text-blue-400 hover:underline">Riset</button></td></tr>
-                        <tr><td class="px-4 py-2 font-bold text-emerald-400">Toyota</td><td class="px-4 py-2">Agya 1.0 / 1.2 G / GR Sport</td><td class="px-4 py-2">2013 - 2026</td><td class="px-4 py-2 font-semibold text-amber-400">Rp 65.000.000 - Rp 180.000.000</td><td class="px-4 py-2 text-center"><button onclick="quickSearch('Toyota Agya Bekas')" class="text-blue-400 hover:underline">Riset</button></td></tr>
-                        <tr><td class="px-4 py-2 font-bold text-emerald-400">Toyota</td><td class="px-4 py-2">Yaris Bakpao / Heykers / Joker</td><td class="px-4 py-2">2006 - 2024</td><td class="px-4 py-2 font-semibold text-amber-400">Rp 70.000.000 - Rp 220.000.000</td><td class="px-4 py-2 text-center"><button onclick="quickSearch('Toyota Yaris Bekas')" class="text-blue-400 hover:underline">Riset</button></td></tr>
-                        <tr><td class="px-4 py-2 font-bold text-emerald-400">Toyota</td><td class="px-4 py-2">Rush 1.5 S / TRD / GR Sport</td><td class="px-4 py-2">2007 - 2026</td><td class="px-4 py-2 font-semibold text-amber-400">Rp 80.000.000 - Rp 250.000.000</td><td class="px-4 py-2 text-center"><button onclick="quickSearch('Toyota Rush TRD GR')" class="text-blue-400 hover:underline">Riset</button></td></tr>
-                        <tr><td class="px-4 py-2 font-bold text-emerald-400">Toyota</td><td class="px-4 py-2">Calya 1.2 E / G</td><td class="px-4 py-2">2016 - 2026</td><td class="px-4 py-2 font-semibold text-amber-400">Rp 85.000.000 - Rp 145.000.000</td><td class="px-4 py-2 text-center"><button onclick="quickSearch('Toyota Calya')" class="text-blue-400 hover:underline">Riset</button></td></tr>
-
-                        <!-- Honda -->
-                        <tr><td class="px-4 py-2 font-bold text-blue-400">Honda</td><td class="px-4 py-2">Brio Satya / RS CVT</td><td class="px-4 py-2">2012 - 2026</td><td class="px-4 py-2 font-semibold text-amber-400">Rp 75.000.000 - Rp 185.000.000</td><td class="px-4 py-2 text-center"><button onclick="quickSearch('Honda Brio Satya RS')" class="text-blue-400 hover:underline">Riset</button></td></tr>
-                        <tr><td class="px-4 py-2 font-bold text-blue-400">Honda</td><td class="px-4 py-2">Jazz GD3 / GE8 / GK5</td><td class="px-4 py-2">2005 - 2021</td><td class="px-4 py-2 font-semibold text-amber-400">Rp 60.000.000 - Rp 230.000.000</td><td class="px-4 py-2 text-center"><button onclick="quickSearch('Honda Jazz GE8 GK5')" class="text-blue-400 hover:underline">Riset</button></td></tr>
-                        <tr><td class="px-4 py-2 font-bold text-blue-400">Honda</td><td class="px-4 py-2">HR-V 1.5 E / Prestige / SE / RS Turbo</td><td class="px-4 py-2">2015 - 2026</td><td class="px-4 py-2 font-semibold text-amber-400">Rp 170.000.000 - Rp 380.000.000</td><td class="px-4 py-2 text-center"><button onclick="quickSearch('Honda HRV Prestige RS')" class="text-blue-400 hover:underline">Riset</button></td></tr>
-                        <tr><td class="px-4 py-2 font-bold text-blue-400">Honda</td><td class="px-4 py-2">CR-V Gen 2 / Gen 3 / Gen 4 / Turbo</td><td class="px-4 py-2">2005 - 2026</td><td class="px-4 py-2 font-semibold text-amber-400">Rp 65.000.000 - Rp 490.000.000</td><td class="px-4 py-2 text-center"><button onclick="quickSearch('Honda CRV Turbo')" class="text-blue-400 hover:underline">Riset</button></td></tr>
-                        <tr><td class="px-4 py-2 font-bold text-blue-400">Honda</td><td class="px-4 py-2">Freed SD / PSD</td><td class="px-4 py-2">2009 - 2016</td><td class="px-4 py-2 font-semibold text-amber-400">Rp 105.000.000 - Rp 175.000.000</td><td class="px-4 py-2 text-center"><button onclick="quickSearch('Honda Freed PSD')" class="text-blue-400 hover:underline">Riset</button></td></tr>
-                        <tr><td class="px-4 py-2 font-bold text-blue-400">Honda</td><td class="px-4 py-2">Mobilio S / E / RS CVT</td><td class="px-4 py-2">2014 - 2024</td><td class="px-4 py-2 font-semibold text-amber-400">Rp 95.000.000 - Rp 165.000.000</td><td class="px-4 py-2 text-center"><button onclick="quickSearch('Honda Mobilio RS')" class="text-blue-400 hover:underline">Riset</button></td></tr>
-                        <tr><td class="px-4 py-2 font-bold text-blue-400">Honda</td><td class="px-4 py-2">BR-V E / Prestige / N7X</td><td class="px-4 py-2">2016 - 2026</td><td class="px-4 py-2 font-semibold text-amber-400">Rp 135.000.000 - Rp 275.000.000</td><td class="px-4 py-2 text-center"><button onclick="quickSearch('Honda BRV Prestige')" class="text-blue-400 hover:underline">Riset</button></td></tr>
-                        <tr><td class="px-4 py-2 font-bold text-blue-400">Honda</td><td class="px-4 py-2">City Hatchback / Sedan RS</td><td class="px-4 py-2">2005 - 2026</td><td class="px-4 py-2 font-semibold text-amber-400">Rp 55.000.000 - Rp 280.000.000</td><td class="px-4 py-2 text-center"><button onclick="quickSearch('Honda City Hatchback RS')" class="text-blue-400 hover:underline">Riset</button></td></tr>
-
-                        <!-- Mitsubishi -->
-                        <tr><td class="px-4 py-2 font-bold text-rose-400">Mitsubishi</td><td class="px-4 py-2">Pajero Sport Exceed / Dakar 4x2</td><td class="px-4 py-2">2009 - 2015</td><td class="px-4 py-2 font-semibold text-amber-400">Rp 175.000.000 - Rp 260.000.000</td><td class="px-4 py-2 text-center"><button onclick="quickSearch('Pajero Sport Dakar 2012')" class="text-blue-400 hover:underline">Riset</button></td></tr>
-                        <tr><td class="px-4 py-2 font-bold text-rose-400">Mitsubishi</td><td class="px-4 py-2">All New Pajero Sport Dakar / Ultimate</td><td class="px-4 py-2">2016 - 2026</td><td class="px-4 py-2 font-semibold text-amber-400">Rp 370.000.000 - Rp 620.000.000</td><td class="px-4 py-2 text-center"><button onclick="quickSearch('All New Pajero Sport Dakar')" class="text-blue-400 hover:underline">Riset</button></td></tr>
-                        <tr><td class="px-4 py-2 font-bold text-rose-400">Mitsubishi</td><td class="px-4 py-2">Xpander GLS / Exceed / Ultimate / Cross</td><td class="px-4 py-2">2017 - 2026</td><td class="px-4 py-2 font-semibold text-amber-400">Rp 160.000.000 - Rp 295.000.000</td><td class="px-4 py-2 text-center"><button onclick="quickSearch('Mitsubishi Xpander Ultimate')" class="text-blue-400 hover:underline">Riset</button></td></tr>
-                        <tr><td class="px-4 py-2 font-bold text-rose-400">Mitsubishi</td><td class="px-4 py-2">Outlander Sport PX / GLS</td><td class="px-4 py-2">2012 - 2020</td><td class="px-4 py-2 font-semibold text-amber-400">Rp 115.000.000 - Rp 185.000.000</td><td class="px-4 py-2 text-center"><button onclick="quickSearch('Outlander Sport PX')" class="text-blue-400 hover:underline">Riset</button></td></tr>
-
-                        <!-- Daihatsu -->
-                        <tr><td class="px-4 py-2 font-bold text-sky-400">Daihatsu</td><td class="px-4 py-2">Xenia 1.0 / 1.3 Li / Xi / All New</td><td class="px-4 py-2">2005 - 2026</td><td class="px-4 py-2 font-semibold text-amber-400">Rp 50.000.000 - Rp 215.000.000</td><td class="px-4 py-2 text-center"><button onclick="quickSearch('Daihatsu Xenia Bekas')" class="text-blue-400 hover:underline">Riset</button></td></tr>
-                        <tr><td class="px-4 py-2 font-bold text-sky-400">Daihatsu</td><td class="px-4 py-2">Terios TS / TX / R Deluxe / Custom</td><td class="px-4 py-2">2007 - 2026</td><td class="px-4 py-2 font-semibold text-amber-400">Rp 75.000.000 - Rp 230.000.000</td><td class="px-4 py-2 text-center"><button onclick="quickSearch('Daihatsu Terios R Deluxe')" class="text-blue-400 hover:underline">Riset</button></td></tr>
-                        <tr><td class="px-4 py-2 font-bold text-sky-400">Daihatsu</td><td class="px-4 py-2">Ayla 1.0 / 1.2 M / X / R</td><td class="px-4 py-2">2013 - 2026</td><td class="px-4 py-2 font-semibold text-amber-400">Rp 60.000.000 - Rp 165.000.000</td><td class="px-4 py-2 text-center"><button onclick="quickSearch('Daihatsu Ayla')" class="text-blue-400 hover:underline">Riset</button></td></tr>
-                        <tr><td class="px-4 py-2 font-bold text-sky-400">Daihatsu</td><td class="px-4 py-2">Sigra 1.0 / 1.2 M / X / R</td><td class="px-4 py-2">2016 - 2026</td><td class="px-4 py-2 font-semibold text-amber-400">Rp 75.000.000 - Rp 140.000.000</td><td class="px-4 py-2 text-center"><button onclick="quickSearch('Daihatsu Sigra')" class="text-blue-400 hover:underline">Riset</button></td></tr>
-                        <tr><td class="px-4 py-2 font-bold text-sky-400">Daihatsu</td><td class="px-4 py-2">Gran Max Mini Bus / Blind Van</td><td class="px-4 py-2">2008 - 2026</td><td class="px-4 py-2 font-semibold text-amber-400">Rp 55.000.000 - Rp 135.000.000</td><td class="px-4 py-2 text-center"><button onclick="quickSearch('Gran Max Mini Bus')" class="text-blue-400 hover:underline">Riset</button></td></tr>
-
-                        <!-- Suzuki -->
-                        <tr><td class="px-4 py-2 font-bold text-indigo-400">Suzuki</td><td class="px-4 py-2">Ertiga GL / GX / Dreza / Hybrid</td><td class="px-4 py-2">2012 - 2026</td><td class="px-4 py-2 font-semibold text-amber-400">Rp 90.000.000 - Rp 235.000.000</td><td class="px-4 py-2 text-center"><button onclick="quickSearch('Suzuki Ertiga GL GX')" class="text-blue-400 hover:underline">Riset</button></td></tr>
-                        <tr><td class="px-4 py-2 font-bold text-indigo-400">Suzuki</td><td class="px-4 py-2">XL7 Beta / Alpha Hybrid</td><td class="px-4 py-2">2020 - 2026</td><td class="px-4 py-2 font-semibold text-amber-400">Rp 175.000.000 - Rp 255.000.000</td><td class="px-4 py-2 text-center"><button onclick="quickSearch('Suzuki XL7 Alpha')" class="text-blue-400 hover:underline">Riset</button></td></tr>
-                        <tr><td class="px-4 py-2 font-bold text-indigo-400">Suzuki</td><td class="px-4 py-2">Swift ST / GT2 / GX</td><td class="px-4 py-2">2006 - 2017</td><td class="px-4 py-2 font-semibold text-amber-400">Rp 65.000.000 - Rp 140.000.000</td><td class="px-4 py-2 text-center"><button onclick="quickSearch('Suzuki Swift GX')" class="text-blue-400 hover:underline">Riset</button></td></tr>
-                        <tr><td class="px-4 py-2 font-bold text-indigo-400">Suzuki</td><td class="px-4 py-2">Grand Vitara 2.0 / 2.4 / Hybrid</td><td class="px-4 py-2">2006 - 2026</td><td class="px-4 py-2 font-semibold text-amber-400">Rp 70.000.000 - Rp 330.000.000</td><td class="px-4 py-2 text-center"><button onclick="quickSearch('Suzuki Grand Vitara')" class="text-blue-400 hover:underline">Riset</button></td></tr>
-
-                        <!-- Nissan -->
-                        <tr><td class="px-4 py-2 font-bold text-purple-400">Nissan</td><td class="px-4 py-2">Grand Livina SV / XV / Ultimate / Highway Star</td><td class="px-4 py-2">2007 - 2019</td><td class="px-4 py-2 font-semibold text-amber-400">Rp 55.000.000 - Rp 130.000.000</td><td class="px-4 py-2 text-center"><button onclick="quickSearch('Nissan Grand Livina')" class="text-blue-400 hover:underline">Riset</button></td></tr>
-                        <tr><td class="px-4 py-2 font-bold text-purple-400">Nissan</td><td class="px-4 py-2">X-Trail T30 / T31 / T32</td><td class="px-4 py-2">2005 - 2021</td><td class="px-4 py-2 font-semibold text-amber-400">Rp 55.000.000 - Rp 240.000.000</td><td class="px-4 py-2 text-center"><button onclick="quickSearch('Nissan Xtrail T31 T32')" class="text-blue-400 hover:underline">Riset</button></td></tr>
-                        <tr><td class="px-4 py-2 font-bold text-purple-400">Nissan</td><td class="px-4 py-2">Serena C24 / C26 / C27</td><td class="px-4 py-2">2005 - 2023</td><td class="px-4 py-2 font-semibold text-amber-400">Rp 60.000.000 - Rp 320.000.000</td><td class="px-4 py-2 text-center"><button onclick="quickSearch('Nissan Serena C26 C27')" class="text-blue-400 hover:underline">Riset</button></td></tr>
-
-                        <!-- Hyundai & Wuling -->
-                        <tr><td class="px-4 py-2 font-bold text-teal-400">Hyundai</td><td class="px-4 py-2">Creta Trend / Style / Prime</td><td class="px-4 py-2">2022 - 2026</td><td class="px-4 py-2 font-semibold text-amber-400">Rp 230.000.000 - Rp 340.000.000</td><td class="px-4 py-2 text-center"><button onclick="quickSearch('Hyundai Creta Prime')" class="text-blue-400 hover:underline">Riset</button></td></tr>
-                        <tr><td class="px-4 py-2 font-bold text-teal-400">Hyundai</td><td class="px-4 py-2">Stargazer Trend / Style / Prime</td><td class="px-4 py-2">2022 - 2026</td><td class="px-4 py-2 font-semibold text-amber-400">Rp 180.000.000 - Rp 255.000.000</td><td class="px-4 py-2 text-center"><button onclick="quickSearch('Hyundai Stargazer')" class="text-blue-400 hover:underline">Riset</button></td></tr>
-                        <tr><td class="px-4 py-2 font-bold text-red-400">Wuling</td><td class="px-4 py-2">Confero S / Cortez / Almaz Turbo</td><td class="px-4 py-2">2017 - 2026</td><td class="px-4 py-2 font-semibold text-amber-400">Rp 75.000.000 - Rp 250.000.000</td><td class="px-4 py-2 text-center"><button onclick="quickSearch('Wuling Cortez Almaz')" class="text-blue-400 hover:underline">Riset</button></td></tr>
+                    <tbody id="marketTableBody" class="divide-y divide-slate-800/70">
+                        <!-- Data ter-render dinamis dari Firebase Cloud -->
                     </tbody>
                 </table>
             </div>
@@ -184,6 +155,14 @@
                         <div>
                             <label class="block text-xs text-slate-400 mb-1">Tahun & Bahan Bakar</label>
                             <input type="text" id="carSpec" placeholder="2019 / Diesel" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-xs text-slate-100 focus:outline-none focus:border-emerald-500">
+                        </div>
+                        <div>
+                            <label class="block text-xs text-slate-400 mb-1">Status Ketersediaan</label>
+                            <select id="carStatus" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-xs text-slate-100 focus:outline-none focus:border-emerald-500">
+                                <option value="Tersedia">🟢 Ready / Tersedia</option>
+                                <option value="Booking">🟡 Booking / DP</option>
+                                <option value="SOLD">🔴 SOLD (Terjual)</option>
+                            </select>
                         </div>
                         <div>
                             <label class="block text-xs text-slate-400 mb-1">Harga Beli / Open (Rp)</label>
@@ -458,9 +437,89 @@
             searchMarketplace('fb');
         }
 
-        // Filter / Searching Tabel Referensi Pasaran
-        function filterMarketTable() {
-            const input = document.getElementById('searchTableInput').value.toLowerCase();
+        function toggleAddPriceModal() {
+            document.getElementById('priceModal').classList.toggle('hidden');
+        }
+
+        // Simpan / Update Pasaran Baru ke Firebase Cloud Database (Real-time tanpa ganti codingan)
+        function saveMarketPriceCloud() {
+            const brand = document.getElementById('mBrand').value.trim();
+            const type = document.getElementById('mType').value.trim();
+            const year = document.getElementById('mYear').value.trim();
+            const price = document.getElementById('mPrice').value.trim();
+            const desc = document.getElementById('mDesc').value.trim();
+
+            if (!brand || !type || !year || !price) {
+                alert("Mohon lengkapi Merk, Tipe, Tahun, dan Harga Pasaran!");
+                return;
+            }
+
+            db.collection("market_prices").add({
+                brand, type, year, price, desc,
+                createdAt: firebase.firestore.FieldValue.serverTimestamp()
+            }).then(() => {
+                showToast("✅ Pasaran Baru Tersimpan di Server Cloud!");
+                document.getElementById('mBrand').value = '';
+                document.getElementById('mType').value = '';
+                document.getElementById('mYear').value = '';
+                document.getElementById('mPrice').value = '';
+                document.getElementById('mDesc').value = '';
+                toggleAddPriceModal();
+            }).catch(err => {
+                alert("Gagal simpan pasaran: " + err.message);
+            });
+        }
+
+        // Realtime Listener Referensi Pasaran dari Cloud Firebase
+        db.collection("market_prices").orderBy("createdAt", "desc").onSnapshot(snapshot => {
+            const tbody = document.getElementById('marketTableBody');
+            
+            // Contoh data default jika database di Firebase masih kosong
+            if (snapshot.empty) {
+                seedInitialMarketData();
+                return;
+            }
+
+            tbody.innerHTML = '';
+            snapshot.forEach(doc => {
+                const data = doc.data();
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td class="px-3 py-2 font-bold text-emerald-400">${data.brand}</td>
+                    <td class="px-3 py-2 font-semibold">${data.type}</td>
+                    <td class="px-3 py-2 text-amber-300 font-bold">${data.year}</td>
+                    <td class="px-3 py-2 font-bold text-amber-400">${data.price}</td>
+                    <td class="px-4 py-2 text-slate-300 text-[11px]">${data.desc || '-'}</td>
+                    <td class="px-3 py-2 text-center">
+                        <button onclick="quickSearch('${data.brand} ${data.type} ${data.year}')" class="text-blue-400 hover:underline">Riset</button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        });
+
+        function seedInitialMarketData() {
+            const defaultPrices = [
+                { brand: 'Toyota', type: 'Avanza 1.3 G M/T', year: '2005', price: 'Rp 65.000.000 - Rp 73.000.000', desc: 'KM 180rb+, Mesin halus kering, AC dingin, interior original, pajak ON, siap pakai.' },
+                { brand: 'Toyota', type: 'Avanza 1.3 G VVT-i', year: '2006', price: 'Rp 70.000.000 - Rp 78.000.000', desc: 'VVT-i irit bbm, bodi kaleng, kaki-kaki empuk, BPKB+STNK lengkap.' },
+                { brand: 'Toyota', type: 'Kijang Innova 2.0 G Bensin', year: '2005', price: 'Rp 80.000.000 - Rp 92.000.000', desc: 'Kabin lapang, AC double blower, kelistrikan normal, ban tebal 80%.' },
+                { brand: 'Toyota', type: 'Innova Reborn 2.4 G Diesel A/T', year: '2017', price: 'Rp 295.000.000 - Rp 325.000.000', desc: 'Mesin 2GD super sehat, transmisi matik smooth, service record Auto2000.' },
+                { brand: 'Honda', type: 'Jazz 1.5 i-DSI M/T', year: '2005', price: 'Rp 62.000.000 - Rp 70.000.000', desc: 'Irit bahan bakar, mesin kering, AC menggigil, velg racing, siap nongkrong.' },
+                { brand: 'Honda', type: 'Jazz 1.5 VTEC Steermatic', year: '2006', price: 'Rp 68.000.000 - Rp 78.000.000', desc: 'VTEC bertenaga, paddle shift setir aktif, matik matang no jedug.' },
+                { brand: 'Mitsubishi', type: 'Pajero Sport 2.5 Dakar 4x2', year: '2012', price: 'Rp 200.000.000 - Rp 225.000.000', desc: 'Sunroof aktif normal, VGT Turbo responsif, kaki-kaki empuk, terawat.' }
+            ];
+
+            defaultPrices.forEach(item => {
+                db.collection("market_prices").add({
+                    ...item,
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                });
+            });
+        }
+
+        // Filter Real-time Tabel Referensi Pasaran
+        function filterMarketplaceTable() {
+            const input = document.getElementById('searchMarketTableInput').value.toLowerCase();
             const rows = document.querySelectorAll('#marketTableBody tr');
 
             rows.forEach(row => {
@@ -519,6 +578,7 @@
             const carName = carNameInput ? carNameInput.value.trim() : '';
             const carNopol = document.getElementById('carNopol').value;
             const carSpec = document.getElementById('carSpec').value;
+            const carStatus = document.getElementById('carStatus').value;
             const carNotes = document.getElementById('carNotes').value.trim();
             const coords = document.getElementById('geoCoords').value;
             const fin = calculateFinancials();
@@ -538,6 +598,7 @@
                 carName: carName,
                 carNopol: carNopol,
                 carSpec: carSpec,
+                carStatus: carStatus || 'Tersedia',
                 carNotes: carNotes,
                 buyPrice: fin.buy,
                 repairCost: fin.repair,
@@ -564,6 +625,7 @@
             document.getElementById('carName').value = '';
             document.getElementById('carNopol').value = '';
             document.getElementById('carSpec').value = '';
+            document.getElementById('carStatus').value = 'Tersedia';
             document.getElementById('carNotes').value = '';
             document.getElementById('buyPrice').value = '';
             document.getElementById('repairCost').value = '';
@@ -573,6 +635,20 @@
             document.getElementById('gpsStatus').innerText = 'Belum diambil';
             document.querySelectorAll('.chk-item').forEach(chk => chk.checked = false);
             calculateFinancials();
+        }
+
+        // Update Cepat Status Unit (Tersedia -> Booking -> SOLD)
+        function updateUnitStatus(docId, currentStatus) {
+            let nextStatus = 'Tersedia';
+            if (currentStatus === 'Tersedia') nextStatus = 'Booking';
+            else if (currentStatus === 'Booking') nextStatus = 'SOLD';
+            else nextStatus = 'Tersedia';
+
+            db.collection("cars").doc(docId).update({
+                carStatus: nextStatus
+            }).then(() => {
+                showToast(`Status diubah ke: ${nextStatus}`);
+            });
         }
 
         function deleteUnit(docId) {
@@ -588,7 +664,7 @@
             });
         }
 
-        // Filter / Searching Stok Unit di Dashboard
+        // Filter / Searching Stok Unit di Dashboard Showroom
         function filterDatabaseUnits() {
             const query = document.getElementById('searchDatabaseInput').value.toLowerCase();
             const cards = document.querySelectorAll('#unitListContainer > div');
@@ -603,7 +679,7 @@
             });
         }
 
-        // Realtime Listener Firebase
+        // Realtime Listener Firebase Stok Unit
         db.collection("cars").orderBy("createdAt", "desc").onSnapshot((snapshot) => {
             const container = document.getElementById('unitListContainer');
             container.innerHTML = '';
@@ -611,27 +687,44 @@
             let sumModal = 0;
             let sumOmset = 0;
             let sumProfit = 0;
-            let count = 0;
+            let activeCount = 0;
             cachedCarsData = [];
 
             snapshot.forEach((doc) => {
-                count++;
                 const item = doc.data();
                 const docId = doc.id;
 
                 cachedCarsData.push(item);
 
-                sumModal += item.totalModal || 0;
-                sumOmset += item.sellPrice || 0;
-                sumProfit += item.profit || 0;
+                const status = item.carStatus || 'Tersedia';
+                if (status !== 'SOLD') {
+                    activeCount++;
+                    sumModal += item.totalModal || 0;
+                    sumOmset += item.sellPrice || 0;
+                    sumProfit += item.profit || 0;
+                }
+
+                // Badge & Theme Status
+                let statusBadge = `<span class="bg-emerald-500/20 text-emerald-400 text-[10px] px-2 py-0.5 rounded border border-emerald-500/30">🟢 Ready</span>`;
+                let cardOpacity = `bg-slate-900 border-slate-700`;
+
+                if (status === 'Booking') {
+                    statusBadge = `<span class="bg-amber-500/20 text-amber-400 text-[10px] px-2 py-0.5 rounded border border-amber-500/30">🟡 Booking</span>`;
+                } else if (status === 'SOLD') {
+                    statusBadge = `<span class="bg-rose-500/20 text-rose-400 text-[10px] px-2 py-0.5 rounded border border-rose-500/30 font-bold">🔴 SOLD</span>`;
+                    cardOpacity = `bg-slate-950/70 border-rose-900/40 opacity-75`;
+                }
 
                 const card = document.createElement('div');
-                card.className = 'bg-slate-900 border border-slate-700 p-4 rounded-xl space-y-3 shadow-sm';
+                card.className = `${cardOpacity} border p-4 rounded-xl space-y-3 shadow-sm transition-all`;
                 
                 card.innerHTML = `
                     <div class="flex justify-between items-start border-b border-slate-800 pb-2">
                         <div>
-                            <h4 class="font-bold text-slate-100 text-sm">${item.carName}</h4>
+                            <div class="flex items-center gap-2">
+                                <h4 class="font-bold text-slate-100 text-sm">${item.carName}</h4>
+                                <button onclick="updateUnitStatus('${docId}', '${status}')" title="Klik untuk ubah status">${statusBadge}</button>
+                            </div>
                             <span class="text-[11px] text-slate-400 block">${item.carNopol || 'Tanpa Nopol'} • ${item.carSpec || '-'}</span>
                         </div>
                         <button onclick="deleteUnit('${docId}')" class="text-rose-400 hover:text-rose-300 text-xs p-1">
@@ -673,8 +766,8 @@
                 container.appendChild(card);
             });
 
-            document.getElementById('unitBadgeCount').innerText = count + ' Unit';
-            document.getElementById('summaryTotalUnit').innerText = count + ' Unit';
+            document.getElementById('unitBadgeCount').innerText = activeCount + ' Ready';
+            document.getElementById('summaryTotalUnit').innerText = activeCount + ' Unit';
             document.getElementById('summaryModal').innerText = 'Rp ' + sumModal.toLocaleString('id-ID');
             document.getElementById('summaryOmset').innerText = 'Rp ' + sumOmset.toLocaleString('id-ID');
             document.getElementById('summaryProfit').innerText = 'Rp ' + sumProfit.toLocaleString('id-ID');
@@ -689,13 +782,14 @@
                 return;
             }
 
-            let csvContent = "data:text/csv;charset=utf-8,Nama Mobil,Nopol,Spesifikasi,Harga Beli,Biaya PR,Total Modal,Target Jual,Estimasi Profit,Catatan PR,Koordinat GPS,Tanggal Inspeksi\n";
+            let csvContent = "data:text/csv;charset=utf-8,Nama Mobil,Nopol,Spesifikasi,Status,Harga Beli,Biaya PR,Total Modal,Target Jual,Estimasi Profit,Catatan PR,Koordinat GPS,Tanggal Inspeksi\n";
 
             cachedCarsData.forEach(item => {
                 const row = [
                     `"${item.carName || ''}"`,
                     `"${item.carNopol || ''}"`,
                     `"${item.carSpec || ''}"`,
+                    `"${item.carStatus || 'Tersedia'}"`,
                     item.buyPrice || 0,
                     item.repairCost || 0,
                     item.totalModal || 0,
