@@ -463,26 +463,30 @@
             }
         }
 
-        function searchMarketplace(platform) {
-            const query = document.getElementById('marketQuery').value.trim() || document.getElementById('carName').value.trim();
-            if (!query) {
-                alert("Ketik nama atau tipe mobil di kolom riset terlebih dahulu!");
-                return;
-            }
+        // Riset Langsung Terkunci Khusus Wilayah Sumatera Utara / Medan
+function searchMarketplace(platform) {
+    const rawQuery = document.getElementById('marketQuery').value.trim() || document.getElementById('carName').value.trim();
+    if (!rawQuery) {
+        alert("Ketik nama atau tipe mobil di kolom riset terlebih dahulu!");
+        return;
+    }
 
-            const encoded = encodeURIComponent(query);
-            if (platform === 'fb') {
-                window.open(`https://www.facebook.com/marketplace/search/?query=${encoded}`, '_blank');
-            } else if (platform === 'olx') {
-                window.open(`https://www.olx.co.id/items/q-${encoded}`, '_blank');
-            }
-        }
+    if (platform === 'fb') {
+        // Menambahkan keyword lokasi 'Medan Sumatera Utara' agar Facebook menyaring iklan lokal
+        const localizedQuery = encodeURIComponent(`${rawQuery} Medan Sumatera Utara`);
+        window.open(`https://www.facebook.com/marketplace/search/?query=${localizedQuery}`, '_blank');
+    } else if (platform === 'olx') {
+        // Mengarahkan langsung ke URL kategori mobil bekas OLX khusus wilayah Sumatera Utara
+        const encodedQuery = encodeURIComponent(rawQuery);
+        window.open(`https://www.olx.co.id/sumatera-utara_g2000007/mobil-bekas_c198?q=${encodedQuery}`, '_blank');
+    }
+}
 
         function quickSearch(keyword) {
-            document.getElementById('marketQuery').value = keyword;
-            searchMarketplace('fb');
-        }
-
+    // Menambahkan lokasi Medan Sumut pada aksi cepat
+    document.getElementById('marketQuery').value = keyword;
+    searchMarketplace('fb');
+}
         function toggleAddPriceModal() {
             document.getElementById('priceModal').classList.toggle('hidden');
         }
