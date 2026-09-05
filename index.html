@@ -596,19 +596,24 @@
                 { brand: 'Mercedes-Benz', type: 'C200 Kompressor (W204)', year: '2008', price: 'Rp 125.000.000 - Rp 145.000.000', desc: 'Tampilan elegan, interior kulit utuh rapi, kencang & nyaman.' }
             ];
 
-            let count = 0;
-            defaultPrices.forEach(item => {
-                db.collection("market_prices").add({
-                    ...item,
-                    createdAt: firebase.firestore.FieldValue.serverTimestamp()
-                }).then(() => {
-                    count++;
-                    if (manualTrigger && count === defaultPrices.length) {
-                        showToast("✅ Berhasil Mengunggah " + count + " Data Pasaran Lengkap ke Cloud!");
-                    }
-                });
-            });
-        }
+           let count = 0;
+    defaultPrices.forEach(item => {
+        // MEMBUAT ID UNIK (Contoh: toyota_avanza_1.3_g_m/t_2005)
+        const docId = `${item.brand}_${item.type}_${item.year}`.replace(/[\s/]+/g, '_').toLowerCase();
+
+        // MENGGUNAKAN .doc(docId).set() AGAR TIDAK DOUBLE
+        db.collection("market_prices").doc(docId).set({
+            ...item,
+            updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+        }, { merge: true }) // merge: true memastikan data lama di-update, bukan diduplikasi
+        .then(() => {
+            count++;
+            if (manualTrigger && count === defaultPrices.length) {
+                showToast("✅ Data berhasil disinkronkan tanpa duplikat!");
+            }
+        });
+    });
+}
 
         function filterMarketplaceTable() {
             const input = document.getElementById('searchMarketTableInput').value.toLowerCase();
