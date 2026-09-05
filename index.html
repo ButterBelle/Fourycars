@@ -33,6 +33,9 @@
                     <p class="text-slate-400 text-xs md:text-sm">Database Inspeksi Kendaraan, Multi-Foto, Edit Stok, & Live Cloud Market Price</p>
                 </div>
                 <div class="flex gap-2">
+                    <button onclick="seedInitialMarketData(true)" class="bg-blue-700 hover:bg-blue-600 text-xs px-3 py-2 rounded-lg border border-blue-600 text-white flex items-center gap-1 font-semibold">
+                        <i class="fa-solid fa-cloud-arrow-up"></i> Push Sampel Data Lengkap
+                    </button>
                     <button onclick="exportToCSV()" class="bg-emerald-700 hover:bg-emerald-600 text-xs px-3 py-2 rounded-lg border border-emerald-600 text-white flex items-center gap-1 font-semibold">
                         <i class="fa-solid fa-file-excel"></i> Export Excel (CSV)
                     </button>
@@ -187,9 +190,7 @@
                     </div>
 
                     <!-- Pratinjau Gambar / Image Preview -->
-                    <div id="imagePreviewContainer" class="flex flex-wrap gap-2 pt-2 hidden">
-                        <!-- Preview gambar dirender di sini via JS -->
-                    </div>
+                    <div id="imagePreviewContainer" class="flex flex-wrap gap-2 pt-2 hidden"></div>
 
                     <!-- Koordinat GPS -->
                     <div class="bg-slate-950 p-2.5 rounded-lg border border-slate-800 text-xs flex justify-between items-center text-slate-400">
@@ -342,7 +343,7 @@
                     <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-2">
                         <label class="block text-xs text-amber-400 font-bold"><i class="fa-solid fa-lock mr-1"></i> Masukkan PIN Keamanan untuk Menyimpan Data:</label>
                         <div class="flex gap-2">
-                            <input type="password" id="userPin" placeholder="PIN Rahasia (Default: 1234)" class="bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-xs text-slate-100 focus:outline-none focus:border-emerald-500 w-full">
+                            <input type="password" id="userPin" placeholder="PIN Rahasia (Default: 187255)" class="bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-xs text-slate-100 focus:outline-none focus:border-emerald-500 w-full">
                             <button type="button" id="btnSaveUnit" onclick="saveUnitData()" class="bg-emerald-600 hover:bg-emerald-500 text-white font-bold px-6 py-2.5 rounded-lg transition-all shadow-lg flex items-center gap-2 text-xs whitespace-nowrap">
                                 <i class="fa-solid fa-cloud-arrow-up"></i> <span id="btnSaveText">Simpan Unit Baru</span>
                             </button>
@@ -367,9 +368,7 @@
                         <input type="text" id="searchDatabaseInput" onkeyup="filterDatabaseUnits()" placeholder="Cari nama, nopol, atau spek di stok..." class="w-full bg-slate-900 border border-slate-700 rounded-lg pl-8 pr-3 py-2 text-xs text-slate-100 focus:outline-none focus:border-emerald-500">
                     </div>
                     
-                    <div id="unitListContainer" class="space-y-3 max-h-[850px] overflow-y-auto pr-1">
-                        <!-- Card unit tersimpan dirender melalui JavaScript -->
-                    </div>
+                    <div id="unitListContainer" class="space-y-3 max-h-[850px] overflow-y-auto pr-1"></div>
                 </div>
             </div>
 
@@ -400,7 +399,6 @@
 
     <!-- Firebase & Application Script -->
     <script>
-        // CONFIG FIREBASE ANDA
         const firebaseConfig = {
             apiKey: "AIzaSyC-JHLnaTkXZ0hx4GQ3xh4WnXah95HvWmU",
             authDomain: "fourycarsdb.firebaseapp.com",
@@ -411,10 +409,8 @@
             measurementId: "G-HQPZ29H0W9"
         };
 
-        // PIN KEAMANAN DEFAULT
         const MASTER_PIN = "187255";
 
-        // Inisialisasi Firebase
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
 
@@ -425,12 +421,9 @@
             const toast = document.getElementById('toast');
             document.getElementById('toastMsg').innerText = msg;
             toast.classList.remove('hidden');
-            setTimeout(() => {
-                toast.classList.add('hidden');
-            }, 3000);
+            setTimeout(() => { toast.classList.add('hidden'); }, 3000);
         }
 
-        // Preview & Resize Gambar ke Base64 (Multi-Foto)
         function previewImages() {
             const input = document.getElementById('carPhotosInput');
             const previewContainer = document.getElementById('imagePreviewContainer');
@@ -442,7 +435,6 @@
                 Array.from(input.files).forEach(file => {
                     const reader = new FileReader();
                     reader.onload = function(e) {
-                        // Compress & Resize Image
                         const img = new Image();
                         img.onload = function() {
                             const canvas = document.createElement('canvas');
@@ -471,7 +463,6 @@
             }
         }
 
-        // Riset Langsung ke Marketplace Publik (FB & OLX)
         function searchMarketplace(platform) {
             const query = document.getElementById('marketQuery').value.trim() || document.getElementById('carName').value.trim();
             if (!query) {
@@ -496,7 +487,6 @@
             document.getElementById('priceModal').classList.toggle('hidden');
         }
 
-        // Simpan / Update Pasaran Baru ke Firebase Cloud Database
         function saveMarketPriceCloud() {
             const brand = document.getElementById('mBrand').value.trim();
             const type = document.getElementById('mType').value.trim();
@@ -520,17 +510,15 @@
                 document.getElementById('mPrice').value = '';
                 document.getElementById('mDesc').value = '';
                 toggleAddPriceModal();
-            }).catch(err => {
-                alert("Gagal simpan pasaran: " + err.message);
-            });
+            }).catch(err => { alert("Gagal simpan pasaran: " + err.message); });
         }
 
-        // Realtime Listener Referensi Pasaran dari Cloud Firebase
+        // Listener Realtime Firebase Pasaran
         db.collection("market_prices").orderBy("createdAt", "desc").onSnapshot(snapshot => {
             const tbody = document.getElementById('marketTableBody');
             
             if (snapshot.empty) {
-                seedInitialMarketData();
+                seedInitialMarketData(false);
                 return;
             }
 
@@ -552,8 +540,8 @@
             });
         });
 
-        // Ribuan/Puluhan Sample Data Komprehensif Berbagai Merk Per-Tahun (2005 - 2026)
-        function seedInitialMarketData() {
+        // FUNGSI PUSH SELURUH DAFTAR SAMPEL MOBIL LENGKAP KE FIREBASE
+        function seedInitialMarketData(manualTrigger = false) {
             const defaultPrices = [
                 // TOYOTA
                 { brand: 'Toyota', type: 'Avanza 1.3 G M/T', year: '2005', price: 'Rp 65.000.000 - Rp 73.000.000', desc: 'KM 180rb+, Mesin halus Kering, AC dingin, sarung jok, pajak ON.' },
@@ -562,12 +550,16 @@
                 { brand: 'Toyota', type: 'Grand New Avanza 1.3 Veloz A/T', year: '2013', price: 'Rp 115.000.000 - Rp 128.000.000', desc: 'Matik smooth, dual airbag, velg racing ori, audio touchscreen.' },
                 { brand: 'Toyota', type: 'Grand New Veloz 1.5 M/T', year: '2016', price: 'Rp 140.000.000 - Rp 158.000.000', desc: 'Mesin Dual VVT-i irit bbm, projector headlamp, bodi mulus.' },
                 { brand: 'Toyota', type: 'All New Veloz 1.5 Q CVT TSS', year: '2022', price: 'Rp 230.000.000 - Rp 255.000.000', desc: 'Fitur Safety Sense lengkap, pemakaian pribadi, gress terawat.' },
+                { brand: 'Toyota', type: 'All New Veloz 1.5 Q CVT TSS', year: '2026', price: 'Rp 265.000.000 - Rp 285.000.000', desc: 'Unit perakitan terbaru gress, KM di bawah 5rb, Toyota Safety Sense.' },
                 { brand: 'Toyota', type: 'Kijang Innova 2.0 G Bensin', year: '2005', price: 'Rp 80.000.000 - Rp 92.000.000', desc: 'Kabin lapang, AC double blower, kelistrikan normal, ban tebal 80%.' },
                 { brand: 'Toyota', type: 'Innova 2.5 G Diesel M/T (2KD)', year: '2008', price: 'Rp 128.000.000 - Rp 145.000.000', desc: 'Mesin 2KD solar irit, bebas ngobos, AC menggigil, BPKB ready.' },
                 { brand: 'Toyota', type: 'Innova Reborn 2.4 G Diesel A/T', year: '2017', price: 'Rp 295.000.000 - Rp 325.000.000', desc: 'Mesin 2GD super bertenaga, matik 6-speed, service record Auto2000.' },
                 { brand: 'Toyota', type: 'Innova Zenix 2.0 V Hybrid', year: '2023', price: 'Rp 440.000.000 - Rp 475.000.000', desc: 'Baterai hybrid garansi resmi, layar 10 inci, panoramic roof.' },
                 { brand: 'Toyota', type: 'Fortuner 2.5 D-4D Diesel', year: '2010', price: 'Rp 170.000.000 - Rp 195.000.000', desc: 'Tampilan gagah, kaki-kaki empuk, AC dingin, interior original.' },
                 { brand: 'Toyota', type: 'Fortuner 2.4 VRZ Diesel A/T', year: '2018', price: 'Rp 385.000.000 - Rp 420.000.000', desc: 'Power back door, paddle shift, jok kulit ori, pajak ON.' },
+                { brand: 'Toyota', type: 'Agya 1.0 G Manual', year: '2014', price: 'Rp 68.000.000 - Rp 78.000.000', desc: 'City car lincah irit, cocok harian, AC dingin, mesin kering.' },
+                { brand: 'Toyota', type: 'Calya 1.2 G A/T', year: '2018', price: 'Rp 98.000.000 - Rp 110.000.000', desc: '7-seater irit bbm, matik responsif, interior bersih terawat.' },
+                { brand: 'Toyota', type: 'Rush 1.5 S TRD Ultimo A/T', year: '2016', price: 'Rp 138.000.000 - Rp 155.000.000', desc: 'Suspensi TRD nyaman, Konde belakang gagah, bodi kaleng.' },
 
                 // HONDA
                 { brand: 'Honda', type: 'Jazz 1.5 i-DSI M/T', year: '2005', price: 'Rp 62.000.000 - Rp 70.000.000', desc: 'Irit bahan bakar, mesin kering, AC menggigil, velg racing, sporty.' },
@@ -576,47 +568,55 @@
                 { brand: 'Honda', type: 'Jazz 1.5 RS CVT (GK5)', year: '2017', price: 'Rp 185.000.000 - Rp 210.000.000', desc: 'LED headlamp, smart key, paddle shift, KM rendah, bebas laka.' },
                 { brand: 'Honda', type: 'Brio Satya 1.2 E CVT', year: '2018', price: 'Rp 118.000.000 - Rp 132.000.000', desc: 'Kaca belakang penuh, irit luar biasa, KM 50rb-an, rawatan resmi.' },
                 { brand: 'Honda', type: 'HR-V 1.5 E CVT Special Edition', year: '2019', price: 'Rp 225.000.000 - Rp 250.000.000', desc: 'Lampu LED DRL facelift, smart key, leather seat, electric brake.' },
+                { brand: 'Honda', type: 'All New HR-V 1.5 RS Turbo', year: '2024', price: 'Rp 410.000.000 - Rp 445.000.000', desc: 'VTEC Turbo 177 PS, Honda Sensing, panoramic roof, gress.' },
                 { brand: 'Honda', type: 'CR-V 2.0 Gen 3 M/T', year: '2008', price: 'Rp 90.000.000 - Rp 105.000.000', desc: 'Model kura-kura gagah, AC dingin, suspensi empuk, bebas banjir.' },
                 { brand: 'Honda', type: 'CR-V 1.5 Prestige Turbo', year: '2018', price: 'Rp 310.000.000 - Rp 345.000.000', desc: 'Panoramic sunroof, power tailgate, 7-seater, audio BOSE.' },
+                { brand: 'Honda', type: 'Freed 1.5 E PSD A/T', year: '2012', price: 'Rp 125.000.000 - Rp 142.000.000', desc: 'Pintu geser elektrik kanan/kiri aktif, kapten seat, nyaman.' },
 
                 // MITSUBISHI
                 { brand: 'Mitsubishi', type: 'Pajero Sport 2.5 Dakar 4x2', year: '2012', price: 'Rp 200.000.000 - Rp 225.000.000', desc: 'Sunroof aktif normal, VGT Turbo responsif, kaki-kaki empuk.' },
+                { brand: 'Mitsubishi', type: 'All New Pajero Sport Dakar 4x2', year: '2021', price: 'Rp 480.000.000 - Rp 520.000.000', desc: 'Speedometer TFT 8 inci, adaptive cruise control, cat orisinil.' },
                 { brand: 'Mitsubishi', type: 'Xpander 1.5 Ultimate A/T', year: '2018', price: 'Rp 175.000.000 - Rp 195.000.000', desc: 'Kabin paling senyap, kamera mundur, AC double blower dingin.' },
                 { brand: 'Mitsubishi', type: 'Outlander Sport PX A/T', year: '2014', price: 'Rp 130.000.000 - Rp 150.000.000', desc: 'Panoramic glass roof, paddle shift, jok kulit ori, gagah.' },
 
                 // DAIHATSU & SUZUKI
                 { brand: 'Daihatsu', type: 'Xenia 1.3 Xi VVT-i', year: '2007', price: 'Rp 60.000.000 - Rp 68.000.000', desc: 'Irit bbm, perawatan mudah, AC dingin, BPKB ready.' },
                 { brand: 'Daihatsu', type: 'Terios 1.5 R Deluxe A/T', year: '2019', price: 'Rp 175.000.000 - Rp 192.000.000', desc: 'Kamera 360 derajat, push start button, ground clearance tinggi.' },
+                { brand: 'Daihatsu', type: 'Sigra 1.2 R Deluxe M/T', year: '2022', price: 'Rp 105.000.000 - Rp 118.000.000', desc: 'Pajak ON panjang, headunit touchscreen, 7-seater irit.' },
                 { brand: 'Suzuki', type: 'Swift 1.5 GT2 Manual', year: '2008', price: 'Rp 70.000.000 - Rp 80.000.000', desc: 'Bodykit GT2 ori, rem cakram 4 roda, handling presisi.' },
                 { brand: 'Suzuki', type: 'Ertiga 1.4 GX Manual', year: '2014', price: 'Rp 105.000.000 - Rp 118.000.000', desc: 'AC Double Blower, penggerak depan nyaman, kunci immobilizer.' },
+                { brand: 'Suzuki', type: 'XL7 1.5 Alpha Hybrid A/T', year: '2023', price: 'Rp 225.000.000 - Rp 245.000.000', desc: 'Teknologi Smart Hybrid Suzuki irit bbm, e-mirror spion kamera.' },
 
-                // EROPA & LAINNYA (BMW, MERCEDES, MAZDA)
-                { brand: 'Mazda', type: 'Mazda 2 1.5 R A/T', year: '2011', price: 'Rp 75.000.000 - Rp 88.000.000', desc: 'Handling lincah, fitur komplit, tombol audio setir, mulus.' },
-                { brand: 'Mazda', type: 'Mazda CX-5 2.5 Grand Touring', year: '2014', price: 'Rp 165.000.000 - Rp 190.000.000', desc: 'Sunroof, audio Bose 9 speaker, jok kulit, teknologi SkyActiv.' },
+                // NISSAN, HYUNDAI, WULING, MAZDA, BMW & MERCEDES
+                { brand: 'Nissan', type: 'Grand Livina 1.5 XV M/T', year: '2009', price: 'Rp 60.000.000 - Rp 70.000.000', desc: 'Kenyamanan ala sedan, suspensi empuk, AC dingin, TV plafon.' },
+                { brand: 'Hyundai', type: 'Creta 1.5 Prime IVT', year: '2022', price: 'Rp 280.000.000 - Rp 310.000.000', desc: 'Hyundai Smartsense, sound BOSE, panoramic sunroof besar.' },
+                { brand: 'Wuling', type: 'Almaz 1.5 LT Lux Turbo', year: '2020', price: 'Rp 185.000.000 - Rp 210.000.000', desc: 'Perintah suara WIND Bahasa Indonesia, HU vertikal 10.4 inci.' },
+                { brand: 'Mazda', type: 'Mazda CX-5 2.5 Grand Touring', year: '2014', price: 'Rp 165.000.000 - Rp 190.000.000', desc: 'Sunroof, audio Bose 9 speaker, jok kulit, SkyActiv.' },
                 { brand: 'BMW', type: 'BMW 320i LCI (E90)', year: '2009', price: 'Rp 110.000.000 - Rp 135.000.000', desc: 'Mesin N46, jok kulit, joystick matik LCI, mewah terawat.' },
-                { brand: 'Mercedes-Benz', type: 'C200 Kompressor (W204)', year: '2008', price: 'Rp 125.000.000 - Rp 145.000.000', desc: 'Tampilan elagan, interior kulit utuh rapi, kencang & nyaman.' }
+                { brand: 'Mercedes-Benz', type: 'C200 Kompressor (W204)', year: '2008', price: 'Rp 125.000.000 - Rp 145.000.000', desc: 'Tampilan elegan, interior kulit utuh rapi, kencang & nyaman.' }
             ];
 
+            let count = 0;
             defaultPrices.forEach(item => {
                 db.collection("market_prices").add({
                     ...item,
                     createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                }).then(() => {
+                    count++;
+                    if (manualTrigger && count === defaultPrices.length) {
+                        showToast("✅ Berhasil Mengunggah " + count + " Data Pasaran Lengkap ke Cloud!");
+                    }
                 });
             });
         }
 
-        // Filter Real-time Tabel Referensi Pasaran
         function filterMarketplaceTable() {
             const input = document.getElementById('searchMarketTableInput').value.toLowerCase();
             const rows = document.querySelectorAll('#marketTableBody tr');
 
             rows.forEach(row => {
                 const text = row.innerText.toLowerCase();
-                if (text.includes(input)) {
-                    row.style.display = '';
-                } else {
-                    row.style.display = 'none';
-                }
+                row.style.display = text.includes(input) ? '' : 'none';
             });
         }
 
@@ -636,9 +636,7 @@
                         showToast("⚠️ Izin lokasi ditolak browser.");
                     }
                 );
-            } else {
-                alert("Browser Anda tidak mendukung fitur Geolocation GPS.");
-            }
+            } else { alert("Browser Anda tidak mendukung fitur Geolocation GPS."); }
         }
 
         function calculateFinancials() {
@@ -655,7 +653,6 @@
             return { totalModal, profit, buy, repair, sell };
         }
 
-        // Simpan / Edit Data Stok Unit ke Firebase
         function saveUnitData() {
             const pinInput = document.getElementById('userPin').value;
             if (pinInput !== MASTER_PIN) {
@@ -680,9 +677,7 @@
             }
 
             const checkedPoints = [];
-            document.querySelectorAll('.chk-item:checked').forEach(chk => {
-                checkedPoints.push(chk.value);
-            });
+            document.querySelectorAll('.chk-item:checked').forEach(chk => { checkedPoints.push(chk.value); });
 
             const unitPayload = {
                 carName: carName,
@@ -703,26 +698,17 @@
             };
 
             if (editId) {
-                // Modus UPDATE
                 db.collection("cars").doc(editId).update(unitPayload)
-                .then(() => {
-                    showToast('✅ Data Unit Berhasil Diperbarui!');
-                    resetForm();
-                })
+                .then(() => { showToast('✅ Data Unit Berhasil Diperbarui!'); resetForm(); })
                 .catch(err => showToast('❌ Gagal Update: ' + err.message));
             } else {
-                // Modus BARU
                 unitPayload.createdAt = firebase.firestore.FieldValue.serverTimestamp();
                 db.collection("cars").add(unitPayload)
-                .then(() => {
-                    showToast('✅ Berhasil Tersimpan di Server Google Cloud!');
-                    resetForm();
-                })
+                .then(() => { showToast('✅ Berhasil Tersimpan di Server Google Cloud!'); resetForm(); })
                 .catch(err => showToast('❌ Gagal Simpan: ' + err.message));
             }
         }
 
-        // Fitur EDIT STOK UNIT (Populate Data Kembali ke Form)
         function editUnitData(docId) {
             const unit = cachedCarsData.find(u => u._id === docId);
             if (!unit) return;
@@ -738,16 +724,12 @@
             document.getElementById('carNotes').value = unit.carNotes || '';
             document.getElementById('geoCoords').value = unit.coords || '';
 
-            if (unit.coords) {
-                document.getElementById('gpsStatus').innerText = unit.coords;
-            }
+            if (unit.coords) { document.getElementById('gpsStatus').innerText = unit.coords; }
 
-            // Uncheck semua lalu centang sesuai checklist unit ini
             document.querySelectorAll('.chk-item').forEach(chk => {
                 chk.checked = unit.checklist && unit.checklist.includes(chk.value);
             });
 
-            // Populate Foto
             currentPhotosBase64 = unit.photos || [];
             const previewContainer = document.getElementById('imagePreviewContainer');
             previewContainer.innerHTML = '';
@@ -759,16 +741,11 @@
                     thumb.className = 'w-16 h-16 object-cover rounded-lg border border-slate-700 shadow-sm';
                     previewContainer.appendChild(thumb);
                 });
-            } else {
-                previewContainer.classList.add('hidden');
-            }
+            } else { previewContainer.classList.add('hidden'); }
 
             calculateFinancials();
-
-            // Ubah Teks Tombol
             document.getElementById('btnSaveText').innerText = 'Update Data Unit';
             document.getElementById('carName').focus();
-
             window.scrollTo({ top: 300, behavior: 'smooth' });
             showToast('✏️ Data unit dimuat ke form, silakan edit!');
         }
@@ -795,18 +772,14 @@
             calculateFinancials();
         }
 
-        // Update Cepat Status Unit (Tersedia -> Booking -> SOLD)
         function updateUnitStatus(docId, currentStatus) {
             let nextStatus = 'Tersedia';
             if (currentStatus === 'Tersedia') nextStatus = 'Booking';
             else if (currentStatus === 'Booking') nextStatus = 'SOLD';
             else nextStatus = 'Tersedia';
 
-            db.collection("cars").doc(docId).update({
-                carStatus: nextStatus
-            }).then(() => {
-                showToast(`Status diubah ke: ${nextStatus}`);
-            });
+            db.collection("cars").doc(docId).update({ carStatus: nextStatus })
+            .then(() => { showToast(`Status diubah ke: ${nextStatus}`); });
         }
 
         function deleteUnit(docId) {
@@ -816,36 +789,25 @@
                 return;
             }
 
-            db.collection("cars").doc(docId).delete()
-            .then(() => {
-                showToast('🗑️ Data berhasil dihapus.');
-            });
+            db.collection("cars").doc(docId).delete().then(() => { showToast('🗑️ Data berhasil dihapus.'); });
         }
 
-        // Filter / Searching Stok Unit di Dashboard Showroom
         function filterDatabaseUnits() {
             const query = document.getElementById('searchDatabaseInput').value.toLowerCase();
             const cards = document.querySelectorAll('#unitListContainer > div');
             
             cards.forEach(card => {
                 const text = card.innerText.toLowerCase();
-                if (text.includes(query)) {
-                    card.style.display = 'block';
-                } else {
-                    card.style.display = 'none';
-                }
+                card.style.display = text.includes(query) ? 'block' : 'none';
             });
         }
 
-        // Realtime Listener Firebase Stok Unit
+        // Listener Realtime Stok Unit Dashboard
         db.collection("cars").orderBy("createdAt", "desc").onSnapshot((snapshot) => {
             const container = document.getElementById('unitListContainer');
             container.innerHTML = '';
 
-            let sumModal = 0;
-            let sumOmset = 0;
-            let sumProfit = 0;
-            let activeCount = 0;
+            let sumModal = 0, sumOmset = 0, sumProfit = 0, activeCount = 0;
             cachedCarsData = [];
 
             snapshot.forEach((doc) => {
@@ -863,7 +825,6 @@
                     sumProfit += item.profit || 0;
                 }
 
-                // Badge & Theme Status
                 let statusBadge = `<span class="bg-emerald-500/20 text-emerald-400 text-[10px] px-2 py-0.5 rounded border border-emerald-500/30">🟢 Ready</span>`;
                 let cardOpacity = `bg-slate-900 border-slate-700`;
 
@@ -874,7 +835,6 @@
                     cardOpacity = `bg-slate-950/70 border-rose-900/40 opacity-75`;
                 }
 
-                // Render Galeri Foto Mini jika ada
                 let photosHtml = '';
                 if (item.photos && item.photos.length > 0) {
                     photosHtml = `<div class="flex gap-1.5 overflow-x-auto pb-1">
@@ -895,10 +855,10 @@
                             <span class="text-[11px] text-slate-400 block">${item.carNopol || 'Tanpa Nopol'} • ${item.carSpec || '-'}</span>
                         </div>
                         <div class="flex gap-1">
-                            <button onclick="editUnitData('${docId}')" class="text-amber-400 hover:text-amber-300 text-xs px-1.5 py-1 bg-amber-500/10 border border-amber-500/30 rounded" title="Edit Unit Ini">
+                            <button onclick="editUnitData('${docId}')" class="text-amber-400 hover:text-amber-300 text-xs px-1.5 py-1 bg-amber-500/10 border border-amber-500/30 rounded">
                                 <i class="fa-solid fa-pen"></i> Edit
                             </button>
-                            <button onclick="deleteUnit('${docId}')" class="text-rose-400 hover:text-rose-300 text-xs px-1.5 py-1 bg-rose-500/10 border border-rose-500/30 rounded" title="Hapus">
+                            <button onclick="deleteUnit('${docId}')" class="text-rose-400 hover:text-rose-300 text-xs px-1.5 py-1 bg-rose-500/10 border border-rose-500/30 rounded">
                                 <i class="fa-solid fa-trash-can"></i>
                             </button>
                         </div>
@@ -922,13 +882,10 @@
                     </div>
 
                     ${item.coords ? `<div class="text-[10px] text-slate-400"><i class="fa-solid fa-location-dot text-rose-400 mr-1"></i><a href="https://maps.google.com/?q=${item.coords}" target="_blank" class="text-blue-400 underline">Lihat Peta Lokasi Pembelian</a></div>` : ''}
-
                     ${item.carNotes ? `<div class="text-[11px] bg-amber-500/10 border border-amber-500/30 p-2 rounded text-amber-300"><strong>Catatan PR:</strong> ${item.carNotes}</div>` : ''}
 
                     <div>
-                        <span class="text-[10px] text-emerald-400 font-bold uppercase tracking-wider block mb-1">
-                            Poin Lolos (${item.checklist ? item.checklist.length : 0}):
-                        </span>
+                        <span class="text-[10px] text-emerald-400 font-bold uppercase tracking-wider block mb-1">Poin Lolos (${item.checklist ? item.checklist.length : 0}):</span>
                         <div class="flex flex-wrap gap-1 max-h-24 overflow-y-auto pr-1">
                             ${item.checklist && item.checklist.length > 0 ? item.checklist.map(point => `<span class="bg-slate-800 text-slate-300 text-[10px] px-2 py-0.5 rounded border border-slate-700">${point}</span>`).join('') : '<span class="text-[10px] text-slate-500">Tidak ada item tercentang</span>'}
                         </div>
@@ -949,7 +906,6 @@
             filterDatabaseUnits();
         });
 
-        // Fitur Export ke Excel (Format CSV)
         function exportToCSV() {
             if (cachedCarsData.length === 0) {
                 alert("Belum ada data unit untuk di-export.");
