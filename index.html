@@ -28,7 +28,7 @@
             <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b border-slate-700 pb-4">
                 <div>
                     <h1 class="text-2xl md:text-3xl font-extrabold text-emerald-400 flex items-center gap-2">
-                        <i class="fa-solid fa-cloud"></i>Fourycars by. Muhammad Yuda M.
+                        <i class="fa-solid fa-cloud"></i> Fourycars by. Muhammad Yuda M.
                     </h1>
                     <p class="text-slate-400 text-xs md:text-sm">Database Inspeksi Kendaraan, Keuangan & GPS Location (Firebase Cloud)</p>
                 </div>
@@ -62,6 +62,43 @@
                 </div>
             </div>
         </header>
+
+        <!-- Modul Riset Pasar & Referensi Pasaran Bekas -->
+        <section class="bg-slate-800 p-5 rounded-xl border border-slate-700 shadow-md space-y-4">
+            <h2 class="text-base font-bold text-slate-200 flex items-center gap-2 border-b border-slate-700 pb-2">
+                <i class="fa-solid fa-magnifying-glass-dollar text-emerald-400"></i> Riset Harga Pasaran & Cek Marketplace
+            </h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+                <div class="col-span-1 md:col-span-2">
+                    <label class="block text-xs text-slate-400 mb-1">Pencarian & Riset Langsung ke Marketplace</label>
+                    <div class="flex gap-2">
+                        <input type="text" id="marketQuery" placeholder="Ketik tipe mobil, misal: Innova Reborn 2018..." class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-xs text-slate-100 focus:outline-none focus:border-emerald-500">
+                        <button type="button" onclick="searchMarketplace('fb')" class="bg-blue-600 hover:bg-blue-500 text-white text-xs px-3 py-2 rounded-lg font-semibold flex items-center gap-1 whitespace-nowrap">
+                            <i class="fa-brands fa-facebook"></i> FB Market
+                        </button>
+                        <button type="button" onclick="searchMarketplace('olx')" class="bg-amber-600 hover:bg-amber-500 text-white text-xs px-3 py-2 rounded-lg font-semibold flex items-center gap-1 whitespace-nowrap">
+                            <i class="fa-solid fa-store"></i> OLX
+                        </button>
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-xs text-slate-400 mb-1">Referensi Harga Pasaran Umum</label>
+                    <select onchange="showBenchmarkPrice(this.value)" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-xs text-slate-100 focus:outline-none focus:border-emerald-500">
+                        <option value="">-- Pilih Referensi Tipe Mobil --</option>
+                        <option value="Innova Reborn 2.4 V/Venturer Diesel (2016-2020)">Innova Reborn Diesel (2016-2020)</option>
+                        <option value="Pajero Sport Dakar 4x2 (2016-2020)">Pajero Sport Dakar (2016-2020)</option>
+                        <option value="Fortuner VRZ Diesel (2016-2020)">Fortuner VRZ Diesel (2016-2020)</option>
+                        <option value="Avanza / Xenia Veloz (2016-2021)">Avanza / Xenia Grand New (2016-2021)</option>
+                        <option value="Honda HR-V E CVT (2016-2020)">Honda HR-V E CVT (2016-2020)</option>
+                        <option value="Honda Brio Satya E CVT (2018-2022)">Honda Brio Satya E CVT (2018-2022)</option>
+                    </select>
+                </div>
+            </div>
+            <div id="benchmarkBox" class="hidden bg-slate-950 p-3 rounded-lg border border-slate-800 text-xs text-slate-300">
+                <span class="text-amber-400 font-bold block mb-1" id="bmTitle"></span>
+                <span id="bmPrice"></span>
+            </div>
+        </section>
 
         <!-- Main Layout Split -->
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -256,7 +293,7 @@
                     <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-2">
                         <label class="block text-xs text-amber-400 font-bold"><i class="fa-solid fa-lock mr-1"></i> Masukkan PIN Keamanan untuk Menyimpan Data:</label>
                         <div class="flex gap-2">
-                            <input type="password" id="userPin" placeholder="PIN Rahasia (Default: 1234)" class="bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-xs text-slate-100 focus:outline-none focus:border-emerald-500 w-full">
+                            <input type="password" id="userPin" placeholder="PIN Rahasia (Default: 187255)" class="bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-xs text-slate-100 focus:outline-none focus:border-emerald-500 w-full">
                             <button type="button" onclick="saveUnitData()" class="bg-emerald-600 hover:bg-emerald-500 text-white font-bold px-6 py-2.5 rounded-lg transition-all shadow-lg flex items-center gap-2 text-xs whitespace-nowrap">
                                 <i class="fa-solid fa-cloud-arrow-up"></i> Simpan Unit
                             </button>
@@ -269,11 +306,17 @@
 
             <!-- Dashboard/Daftar Unit Tersimpan (1 Col) -->
             <div class="space-y-4">
-                <div class="bg-slate-800 p-5 rounded-xl border border-slate-700 shadow-md">
-                    <h2 class="text-base font-bold text-slate-200 border-b border-slate-700 pb-2 mb-4 flex items-center justify-between">
+                <div class="bg-slate-800 p-5 rounded-xl border border-slate-700 shadow-md space-y-3">
+                    <h2 class="text-base font-bold text-slate-200 border-b border-slate-700 pb-2 flex items-center justify-between">
                         <span><i class="fa-solid fa-boxes-stacked text-emerald-400"></i> Stok & Rekapitulasi Unit</span>
                         <span id="unitBadgeCount" class="bg-emerald-500/20 text-emerald-400 text-xs px-2 py-0.5 rounded-full border border-emerald-500/30">0</span>
                     </h2>
+
+                    <!-- Filter / Searching Mobil di Database -->
+                    <div class="relative">
+                        <i class="fa-solid fa-magnifying-glass absolute left-3 top-3 text-xs text-slate-500"></i>
+                        <input type="text" id="searchDatabaseInput" onkeyup="filterDatabaseUnits()" placeholder="Cari nama, nopol, atau spek..." class="w-full bg-slate-900 border border-slate-700 rounded-lg pl-8 pr-3 py-2 text-xs text-slate-100 focus:outline-none focus:border-emerald-500">
+                    </div>
                     
                     <div id="unitListContainer" class="space-y-3 max-h-[850px] overflow-y-auto pr-1">
                         <!-- Card unit tersimpan dirender melalui JavaScript -->
@@ -322,7 +365,7 @@
         // PIN KEAMANAN DEFAULT
         const MASTER_PIN = "187255";
 
-        // Initialize Firebase
+        // Inisialisasi Firebase
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
 
@@ -335,6 +378,45 @@
             setTimeout(() => {
                 toast.classList.add('hidden');
             }, 3000);
+        }
+
+        // Riset Harga Pasaran
+        function searchMarketplace(platform) {
+            const query = document.getElementById('marketQuery').value.trim() || document.getElementById('carName').value.trim();
+            if (!query) {
+                alert("Masukkan nama / tipe mobil di kolom riset pasar terlebih dahulu!");
+                return;
+            }
+
+            const encoded = encodeURIComponent(query);
+            if (platform === 'fb') {
+                window.open(`https://www.facebook.com/marketplace/search/?query=${encoded}`, '_blank');
+            } else if (platform === 'olx') {
+                window.open(`https://www.olx.co.id/items/q-${encoded}`, '_blank');
+            }
+        }
+
+        function showBenchmarkPrice(type) {
+            const box = document.getElementById('benchmarkBox');
+            const title = document.getElementById('bmTitle');
+            const price = document.getElementById('bmPrice');
+
+            const benchmarks = {
+                "Innova Reborn 2.4 V/Venturer Diesel (2016-2020)": "Rentang Pasaran: Rp 310.000.000 - Rp 385.000.000 (Tergantung Kondisi & Odometer)",
+                "Pajero Sport Dakar 4x2 (2016-2020)": "Rentang Pasaran: Rp 370.000.000 - Rp 440.000.000",
+                "Fortuner VRZ Diesel (2016-2020)": "Rentang Pasaran: Rp 365.000.000 - Rp 430.000.000",
+                "Avanza / Xenia Veloz (2016-2021)": "Rentang Pasaran: Rp 135.000.000 - Rp 180.000.000",
+                "Honda HR-V E CVT (2016-2020)": "Rentang Pasaran: Rp 195.000.000 - Rp 245.000.000",
+                "Honda Brio Satya E CVT (2018-2022)": "Rentang Pasaran: Rp 125.000.000 - Rp 155.000.000"
+            };
+
+            if (type && benchmarks[type]) {
+                title.innerText = type;
+                price.innerText = benchmarks[type];
+                box.classList.remove('hidden');
+            } else {
+                box.classList.add('hidden');
+            }
         }
 
         function getGPSLocation() {
@@ -452,6 +534,21 @@
             });
         }
 
+        // Filter / Searching Stok Unit di Dashboard
+        function filterDatabaseUnits() {
+            const query = document.getElementById('searchDatabaseInput').value.toLowerCase();
+            const cards = document.querySelectorAll('#unitListContainer > div');
+            
+            cards.forEach(card => {
+                const text = card.innerText.toLowerCase();
+                if (text.includes(query)) {
+                    card.style.display = 'block';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        }
+
         // Realtime Listener Firebase
         db.collection("cars").orderBy("createdAt", "desc").onSnapshot((snapshot) => {
             const container = document.getElementById('unitListContainer');
@@ -527,6 +624,9 @@
             document.getElementById('summaryModal').innerText = 'Rp ' + sumModal.toLocaleString('id-ID');
             document.getElementById('summaryOmset').innerText = 'Rp ' + sumOmset.toLocaleString('id-ID');
             document.getElementById('summaryProfit').innerText = 'Rp ' + sumProfit.toLocaleString('id-ID');
+            
+            // Re-apply filter if user typing
+            filterDatabaseUnits();
         });
 
         // Fitur Export ke Excel (Format CSV)
