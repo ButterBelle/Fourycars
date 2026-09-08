@@ -237,14 +237,20 @@
                             <i class="fa-solid fa-gears"></i> 2. Dapur Pacu, Pendingin & Kelistrikan
                         </h3>
                         <div class="grid grid-cols-2 md:grid-cols-3 gap-2 text-xs">
-                            <label class="chk-label"><input type="checkbox" value="Engine Mounting Kanan/Kiri Halus" class="chk-item"> Engine Mounting Bagus</label>
+                            <label class="chk-label"><input type="checkbox" value="Starter Tokcer (Mesin Mudah Dihidupkan)" class="chk-item"> Starter Tokcer / Mudah Hidup</label>
+                            <label class="chk-label"><input type="checkbox" value="Starter Mulus (Mesin Tidak Goyang Berlebih)" class="chk-item"> Starter Mulus (Mesin No Goyang)</label>
+                            <label class="chk-label"><input type="checkbox" value="Dipstick Oli Mesin (Volume Normal & Bebas Kerak)" class="chk-item"> Dipstick Oli Mesin (No Kerak)</label>
                             <label class="chk-label"><input type="checkbox" value="Oli Mesin Bersih/No Sludge" class="chk-item"> Oli Mesin (No Sludge)</label>
+                            <label class="chk-label"><input type="checkbox" value="Tutup Radiator Bagus (Karet Utuh, Bebas Karat)" class="chk-item"> Tutup Radiator Bagus (No Karat)</label>
+                            <label class="chk-label"><input type="checkbox" value="Radiator & Coolant OK" class="chk-item"> Radiator & Coolant OK</label>
+                            <label class="chk-label"><input type="checkbox" value="Selang-selang Mesin Lentur (Tidak Kaku/Getas)" class="chk-item"> Selang Mesin Lentur & Aman</label>
+                            <label class="chk-label"><input type="checkbox" value="Selang-selang Radiator Bagus/No Getas" class="chk-item"> Selang Radiator No Getas/Bocor</label>
+                            <label class="chk-label"><input type="checkbox" value="Fanbelt / V-Belt Bagus (Tidak Getas/Retak)" class="chk-item"> Fanbelt / V-Belt Bagus</label>
+                            <label class="chk-label"><input type="checkbox" value="Engine Mounting Kanan/Kiri Halus" class="chk-item"> Engine Mounting Bagus</label>
                             <label class="chk-label"><input type="checkbox" value="Suara Mesin Halus / Piston Normal" class="chk-item"> Suara Mesin Halus</label>
                             <label class="chk-label"><input type="checkbox" value="Injektor / Pengapian OK" class="chk-item"> Injektor / Pengapian OK</label>
                             <label class="chk-label"><input type="checkbox" value="EGR / Intake Sistem OK" class="chk-item"> EGR / Intake Sistem OK</label>
                             <label class="chk-label"><input type="checkbox" value="Bebas Asap Ngebul/Hitam Pekat" class="chk-item"> Bebas Asap Ngebul/Hitam</label>
-                            <label class="chk-label"><input type="checkbox" value="Radiator & Coolant OK" class="chk-item"> Radiator & Coolant OK</label>
-                            <label class="chk-label"><input type="checkbox" value="Selang-selang Radiator Bagus/No Getas" class="chk-item"> Selang Radiator No Getas/Bocor</label>
                             <label class="chk-label"><input type="checkbox" value="Kabel Mesin / Wiring Rapi" class="chk-item"> Wayar/Kabel Rapi (No Jumper)</label>
                             <label class="chk-label"><input type="checkbox" value="Filter Udara & Box Utuh" class="chk-item"> Filter Udara & Box Utuh</label>
                             <label class="chk-label"><input type="checkbox" value="Intercooler Bersih / Bebas Bocor" class="chk-item"> Intercooler Bersih/No Rembes</label>
@@ -260,6 +266,8 @@
                             <i class="fa-solid fa-code-branch"></i> 3. Transmisi & Drivetrain
                         </h3>
                         <div class="grid grid-cols-2 md:grid-cols-3 gap-2 text-xs">
+                            <label class="chk-label"><input type="checkbox" value="Dipstick Oli Matik (Volume Pas & Bebas Kerak)" class="chk-item"> Dipstick Oli Matik (No Kerak)</label>
+                            <label class="chk-label"><input type="checkbox" value="Oper Gigi Manual (Mesin Mati) Lancar / Tidak Serat" class="chk-item"> Oper Gigi (Mesin Mati) Lancar</label>
                             <label class="chk-label"><input type="checkbox" value="Matik Bebas Jedug / Delay" class="chk-item"> Matik Bebas Jedug/Delay</label>
                             <label class="chk-label"><input type="checkbox" value="Transmission Cooler OK" class="chk-item"> Cooler Transmisi OK</label>
                             <label class="chk-label"><input type="checkbox" value="Perpindahan Gigi Smooth" class="chk-item"> Transmisi Smooth</label>
@@ -290,6 +298,8 @@
                             <i class="fa-solid fa-shield-halved"></i> 5. Struktur Rangka & Bodi
                         </h3>
                         <div class="grid grid-cols-2 md:grid-cols-3 gap-2 text-xs">
+                            <label class="chk-label"><input type="checkbox" value="Sealer Kap Mesin Utuh (Bukan Keriting/Repaint)" class="chk-item"> Sealer Kap Mesin Utuh Ori</label>
+                            <label class="chk-label"><input type="checkbox" value="Baut Kap, Bagasi & Mesin Utuh (Belum Pernah Dibongkar)" class="chk-item"> Baut Kap & Bagasi Ori (No Bongkar)</label>
                             <label class="chk-label"><input type="checkbox" value="Apron Depan Utuh/Original" class="chk-item"> Apron Depan Original</label>
                             <label class="chk-label"><input type="checkbox" value="Bullhead & Tiang Radiator Utuh" class="chk-item"> Bullhead & Tiang Radiator</label>
                             <label class="chk-label"><input type="checkbox" value="Chassis / Floor Pan Bebas Banjir" class="chk-item"> Bebas Karat / Banjir</label>
@@ -464,29 +474,27 @@
         }
 
         // Riset Langsung Terkunci Khusus Wilayah Sumatera Utara / Medan
-function searchMarketplace(platform) {
-    const rawQuery = document.getElementById('marketQuery').value.trim() || document.getElementById('carName').value.trim();
-    if (!rawQuery) {
-        alert("Ketik nama atau tipe mobil di kolom riset terlebih dahulu!");
-        return;
-    }
+        function searchMarketplace(platform) {
+            const rawQuery = document.getElementById('marketQuery').value.trim() || document.getElementById('carName').value.trim();
+            if (!rawQuery) {
+                alert("Ketik nama atau tipe mobil di kolom riset terlebih dahulu!");
+                return;
+            }
 
-    if (platform === 'fb') {
-        // Menambahkan keyword lokasi 'Medan Sumatera Utara' agar Facebook menyaring iklan lokal
-        const localizedQuery = encodeURIComponent(`${rawQuery} Medan Sumatera Utara`);
-        window.open(`https://www.facebook.com/marketplace/search/?query=${localizedQuery}`, '_blank');
-    } else if (platform === 'olx') {
-        // Mengarahkan langsung ke URL kategori mobil bekas OLX khusus wilayah Sumatera Utara
-        const encodedQuery = encodeURIComponent(rawQuery);
-        window.open(`https://www.olx.co.id/sumatera-utara_g2000007/mobil-bekas_c198?q=${encodedQuery}`, '_blank');
-    }
-}
+            if (platform === 'fb') {
+                const localizedQuery = encodeURIComponent(`${rawQuery} Medan Sumatera Utara`);
+                window.open(`https://www.facebook.com/marketplace/search/?query=${localizedQuery}`, '_blank');
+            } else if (platform === 'olx') {
+                const encodedQuery = encodeURIComponent(rawQuery);
+                window.open(`https://www.olx.co.id/sumatera-utara_g2000007/mobil-bekas_c198?q=${encodedQuery}`, '_blank');
+            }
+        }
 
         function quickSearch(keyword) {
-    // Menambahkan lokasi Medan Sumut pada aksi cepat
-    document.getElementById('marketQuery').value = keyword;
-    searchMarketplace('fb');
-}
+            document.getElementById('marketQuery').value = keyword;
+            searchMarketplace('fb');
+        }
+
         function toggleAddPriceModal() {
             document.getElementById('priceModal').classList.toggle('hidden');
         }
@@ -600,24 +608,24 @@ function searchMarketplace(platform) {
                 { brand: 'Mercedes-Benz', type: 'C200 Kompressor (W204)', year: '2008', price: 'Rp 125.000.000 - Rp 145.000.000', desc: 'Tampilan elegan, interior kulit utuh rapi, kencang & nyaman.' }
             ];
 
-           let count = 0;
-    defaultPrices.forEach(item => {
-        // MEMBUAT ID UNIK (Contoh: toyota_avanza_1.3_g_m/t_2005)
-        const docId = `${item.brand}_${item.type}_${item.year}`.replace(/[\s/]+/g, '_').toLowerCase();
+            let count = 0;
+            defaultPrices.forEach(item => {
+                const docId = `${item.brand}_${item.type}_${item.year}`.replace(/[\s/]+/g, '_').toLowerCase();
 
-        // MENGGUNAKAN .doc(docId).set() AGAR TIDAK DOUBLE
-        db.collection("market_prices").doc(docId).set({
-            ...item,
-            updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-        }, { merge: true }) // merge: true memastikan data lama di-update, bukan diduplikasi
-        .then(() => {
-            count++;
-            if (manualTrigger && count === defaultPrices.length) {
-                showToast("✅ Data berhasil disinkronkan tanpa duplikat!");
-            }
-        });
-    });
-}
+                // DITAMBAHKAN createdAt agar otomatis terdeteksi oleh listener tabel
+                db.collection("market_prices").doc(docId).set({
+                    ...item,
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                    updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                }, { merge: true }) 
+                .then(() => {
+                    count++;
+                    if (manualTrigger && count === defaultPrices.length) {
+                        showToast("✅ Data berhasil disinkronkan ke dalam tabel!");
+                    }
+                });
+            });
+        }
 
         function filterMarketplaceTable() {
             const input = document.getElementById('searchMarketTableInput').value.toLowerCase();
